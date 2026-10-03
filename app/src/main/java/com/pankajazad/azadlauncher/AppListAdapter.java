@@ -16,6 +16,7 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
     private final List<AppEntry> apps = new ArrayList<>();
     private final AppActionListener listener;
     private boolean showLabels = true;
+    private int iconSizeDp = IconSizeConfiguration.iconSizeDp(IconSizeConfiguration.STANDARD);
 
     AppListAdapter(AppActionListener listener) {
         this.listener = listener;
@@ -34,6 +35,13 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
         }
     }
 
+    void setIconSizeDp(int iconSizeDp) {
+        if (this.iconSizeDp != iconSizeDp) {
+            this.iconSizeDp = iconSizeDp;
+            notifyDataSetChanged();
+        }
+    }
+
     @NonNull
     @Override
     public AppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,6 +52,12 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
     @Override
     public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
         AppEntry app = apps.get(position);
+        int iconSizePixels = Math.round(
+                iconSizeDp * holder.binding.getRoot().getResources().getDisplayMetrics().density);
+        ViewGroup.LayoutParams iconLayout = holder.binding.appIcon.getLayoutParams();
+        iconLayout.width = iconSizePixels;
+        iconLayout.height = iconSizePixels;
+        holder.binding.appIcon.setLayoutParams(iconLayout);
         holder.binding.appIcon.setImageDrawable(app.getIcon());
         holder.binding.appLabel.setText(app.getLabel());
         holder.binding.appLabel.setVisibility(showLabels ? View.VISIBLE : View.GONE);

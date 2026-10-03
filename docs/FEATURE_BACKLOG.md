@@ -10,6 +10,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Drag-and-drop favorite ordering with persistent positions
 - Configurable app-grid columns and app-label visibility
 - System, light, and dark appearance modes
+- Compact, standard, and large app-icon sizes
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings
 - Unit-test, lint, and debug-APK build gates
@@ -19,7 +20,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Draggable workspace pages
 - App folders and drawer organization
 - Android widget hosting and placement
-- Icon size and compatible icon packs
+- Compatible icon packs
 - Drawer groups
 - Configurable gestures and accessibility actions
 - Notification dots with explicit user permission

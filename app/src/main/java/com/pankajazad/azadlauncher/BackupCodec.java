@@ -17,6 +17,7 @@ final class BackupCodec {
         backup.append("gridColumns=").append(data.gridColumns()).append('\n');
         backup.append("showAppLabels=").append(data.showAppLabels()).append('\n');
         backup.append("themeMode=").append(data.themeMode()).append('\n');
+        backup.append("iconSize=").append(data.iconSize()).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
@@ -34,6 +35,7 @@ final class BackupCodec {
         Integer gridColumns = null;
         Boolean showAppLabels = null;
         int themeMode = ThemeConfiguration.FOLLOW_SYSTEM;
+        int iconSize = IconSizeConfiguration.STANDARD;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
@@ -62,6 +64,9 @@ final class BackupCodec {
                 case "themeMode":
                     themeMode = parseInteger(value, "theme mode");
                     break;
+                case "iconSize":
+                    iconSize = parseInteger(value, "icon size");
+                    break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
                     break;
@@ -85,7 +90,11 @@ final class BackupCodec {
         if (!ThemeConfiguration.isValidPreference(themeMode)) {
             throw new IllegalArgumentException("Invalid theme preference");
         }
-        return new LauncherBackupData(gridColumns, showAppLabels, themeMode, favorites, hidden);
+        if (!IconSizeConfiguration.isValidPreference(iconSize)) {
+            throw new IllegalArgumentException("Invalid icon size preference");
+        }
+        return new LauncherBackupData(
+                gridColumns, showAppLabels, themeMode, iconSize, favorites, hidden);
     }
 
     private static int parseInteger(String value, String field) {

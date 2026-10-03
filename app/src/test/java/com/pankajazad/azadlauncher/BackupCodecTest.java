@@ -19,6 +19,7 @@ public class BackupCodecTest {
                 5,
                 false,
                 ThemeConfiguration.DARK,
+                IconSizeConfiguration.LARGE,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -27,6 +28,7 @@ public class BackupCodecTest {
         assertEquals(5, decoded.gridColumns());
         assertFalse(decoded.showAppLabels());
         assertEquals(ThemeConfiguration.DARK, decoded.themeMode());
+        assertEquals(IconSizeConfiguration.LARGE, decoded.iconSize());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -40,6 +42,7 @@ public class BackupCodecTest {
                 GridConfiguration.AUTOMATIC,
                 true,
                 ThemeConfiguration.FOLLOW_SYSTEM,
+                IconSizeConfiguration.STANDARD,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -48,6 +51,7 @@ public class BackupCodecTest {
         assertEquals(GridConfiguration.AUTOMATIC, decoded.gridColumns());
         assertTrue(decoded.showAppLabels());
         assertEquals(ThemeConfiguration.FOLLOW_SYSTEM, decoded.themeMode());
+        assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
@@ -69,6 +73,25 @@ public class BackupCodecTest {
             fail("Expected invalid grid to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("grid"));
+        }
+    }
+
+    @Test
+    public void olderBackupDefaultsToStandardIconSize() {
+        LauncherBackupData decoded = BackupCodec.decode(
+                "version=1\ngridColumns=4\nshowAppLabels=true\n");
+
+        assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
+    }
+
+    @Test
+    public void invalidIconSizeIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\niconSize=9\n");
+            fail("Expected invalid icon size to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("icon size"));
         }
     }
 }

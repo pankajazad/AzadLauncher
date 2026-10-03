@@ -14,6 +14,7 @@
     <string name="customize_launcher">Customize launcher</string>
     <string name="customize_description">Choose how apps are arranged and labeled.</string>
     <string name="grid_columns">App grid columns</string>
+    <string name="icon_size">Icon size</string>
     <string name="show_app_labels">Show app labels</string>
     <string name="appearance">Appearance</string>
     <string name="manage_hidden_apps">Manage hidden apps</string>
@@ -43,5 +44,11 @@
         <item>Follow system</item>
         <item>Light</item>
         <item>Dark</item>
+    </string-array>
+
+    <string-array name="icon_size_options">
+        <item>Compact</item>
+        <item>Standard</item>
+        <item>Large</item>
     </string-array>
 </resources>

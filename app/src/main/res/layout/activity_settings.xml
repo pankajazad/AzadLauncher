@@ -41,6 +41,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:labelFor="@id/icon_size"
+            android:text="@string/icon_size"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+        <Spinner
+            android:id="@+id/icon_size"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:labelFor="@id/theme_mode"
             android:text="@string/appearance"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />

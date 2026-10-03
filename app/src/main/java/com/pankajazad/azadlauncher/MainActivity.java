@@ -104,6 +104,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         boolean showLabels = preferences.showAppLabels();
         appListAdapter.setShowLabels(showLabels);
         favoriteListAdapter.setShowLabels(showLabels);
+        int iconSizeDp = IconSizeConfiguration.iconSizeDp(preferences.iconSize());
+        appListAdapter.setIconSizeDp(iconSizeDp);
+        favoriteListAdapter.setIconSizeDp(iconSizeDp);
     }
 
     private void loadApps() {

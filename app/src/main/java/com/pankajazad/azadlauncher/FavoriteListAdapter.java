@@ -27,6 +27,7 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
     private final ReorderListener reorderListener;
     private DragStarter dragStarter = holder -> { };
     private boolean showLabels = true;
+    private int iconSizeDp = IconSizeConfiguration.iconSizeDp(IconSizeConfiguration.STANDARD);
 
     FavoriteListAdapter(AppActionListener listener, ReorderListener reorderListener) {
         this.listener = listener;
@@ -42,6 +43,13 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
     void setShowLabels(boolean showLabels) {
         if (this.showLabels != showLabels) {
             this.showLabels = showLabels;
+            notifyDataSetChanged();
+        }
+    }
+
+    void setIconSizeDp(int iconSizeDp) {
+        if (this.iconSizeDp != iconSizeDp) {
+            this.iconSizeDp = iconSizeDp;
             notifyDataSetChanged();
         }
     }
@@ -76,6 +84,12 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
     @Override
     public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
         AppEntry app = apps.get(position);
+        int iconSizePixels = Math.round(
+                iconSizeDp * holder.binding.getRoot().getResources().getDisplayMetrics().density);
+        ViewGroup.LayoutParams iconLayout = holder.binding.favoriteIcon.getLayoutParams();
+        iconLayout.width = iconSizePixels;
+        iconLayout.height = iconSizePixels;
+        holder.binding.favoriteIcon.setLayoutParams(iconLayout);
         holder.binding.favoriteIcon.setImageDrawable(app.getIcon());
         holder.binding.favoriteLabel.setText(app.getLabel());
         holder.binding.favoriteLabel.setVisibility(showLabels ? View.VISIBLE : View.GONE);

@@ -17,6 +17,7 @@ final class LauncherPreferences {
     private static final String GRID_COLUMNS_KEY = "grid_columns";
     private static final String SHOW_LABELS_KEY = "show_app_labels";
     private static final String THEME_MODE_KEY = "theme_mode";
+    private static final String ICON_SIZE_KEY = "icon_size";
 
     private final SharedPreferences preferences;
 
@@ -80,11 +81,23 @@ final class LauncherPreferences {
         preferences.edit().putInt(THEME_MODE_KEY, themeMode).apply();
     }
 
+    int iconSize() {
+        int storedSize = preferences.getInt(ICON_SIZE_KEY, IconSizeConfiguration.STANDARD);
+        return IconSizeConfiguration.isValidPreference(storedSize)
+                ? storedSize
+                : IconSizeConfiguration.STANDARD;
+    }
+
+    void setIconSize(int iconSize) {
+        preferences.edit().putInt(ICON_SIZE_KEY, iconSize).apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
                 showAppLabels(),
                 themeMode(),
+                iconSize(),
                 favoriteAppIds(),
                 hiddenAppIds());
     }
@@ -94,6 +107,7 @@ final class LauncherPreferences {
                 .putInt(GRID_COLUMNS_KEY, backupData.gridColumns())
                 .putBoolean(SHOW_LABELS_KEY, backupData.showAppLabels())
                 .putInt(THEME_MODE_KEY, backupData.themeMode())
+                .putInt(ICON_SIZE_KEY, backupData.iconSize())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))
