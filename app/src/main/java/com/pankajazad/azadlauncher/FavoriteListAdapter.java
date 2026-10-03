@@ -1,22 +1,21 @@
 package com.pankajazad.azadlauncher;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.pankajazad.azadlauncher.databinding.ItemAppBinding;
+import com.pankajazad.azadlauncher.databinding.ItemFavoriteAppBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
-final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHolder> {
+final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter.FavoriteViewHolder> {
     private final List<AppEntry> apps = new ArrayList<>();
     private final AppActionListener listener;
 
-    AppListAdapter(AppActionListener listener) {
+    FavoriteListAdapter(AppActionListener listener) {
         this.listener = listener;
     }
 
@@ -28,16 +27,17 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
 
     @NonNull
     @Override
-    public AppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemAppBinding binding = ItemAppBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new AppViewHolder(binding);
+    public FavoriteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemFavoriteAppBinding binding = ItemFavoriteAppBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
+        return new FavoriteViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
         AppEntry app = apps.get(position);
-        holder.binding.appIcon.setImageDrawable(app.getIcon());
-        holder.binding.appLabel.setText(app.getLabel());
+        holder.binding.favoriteIcon.setImageDrawable(app.getIcon());
+        holder.binding.favoriteLabel.setText(app.getLabel());
         holder.binding.getRoot().setContentDescription(app.getLabel());
         holder.binding.getRoot().setOnClickListener(view -> listener.onOpenApp(app));
         holder.binding.getRoot().setOnLongClickListener(view -> listener.onLongPressApp(app));
@@ -48,10 +48,10 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
         return apps.size();
     }
 
-    static final class AppViewHolder extends RecyclerView.ViewHolder {
-        private final ItemAppBinding binding;
+    static final class FavoriteViewHolder extends RecyclerView.ViewHolder {
+        private final ItemFavoriteAppBinding binding;
 
-        AppViewHolder(ItemAppBinding binding) {
+        FavoriteViewHolder(ItemFavoriteAppBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

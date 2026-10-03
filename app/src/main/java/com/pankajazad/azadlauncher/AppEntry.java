@@ -4,18 +4,21 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 
 final class AppEntry {
+    private final String id;
     private final String label;
     private final String packageName;
     private final Drawable icon;
     private final Intent launchIntent;
 
-    AppEntry(String label, String packageName, Drawable icon, Intent launchIntent) {
+    AppEntry(String id, String label, String packageName, Drawable icon, Intent launchIntent) {
+        this.id = id;
         this.label = label;
         this.packageName = packageName;
         this.icon = icon;
         this.launchIntent = launchIntent;
     }
 
+    String getId() { return id; }
     String getLabel() { return label; }
     String getPackageName() { return packageName; }
     Drawable getIcon() { return icon; }

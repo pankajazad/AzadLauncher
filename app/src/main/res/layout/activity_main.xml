@@ -21,11 +21,36 @@
         android:text="@string/home_subtitle"
         android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
+    <TextView
+        android:id="@+id/favorites_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/favorites_title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+    <TextView
+        android:id="@+id/favorites_empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/favorites_empty"
+        android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favorite_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:visibility="gone" />
+
     <androidx.appcompat.widget.SearchView
         android:id="@+id/app_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:iconifiedByDefault="false"
         app:queryHint="@string/search_apps" />
 

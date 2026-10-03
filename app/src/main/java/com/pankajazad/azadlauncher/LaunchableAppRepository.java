@@ -33,6 +33,7 @@ final class LaunchableAppRepository {
             }
             Intent launchIntent = new Intent(intent).setComponent(component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             apps.add(new AppEntry(
+                    component.flattenToString(),
                     info.loadLabel(packageManager).toString(),
                     component.getPackageName(),
                     info.loadIcon(packageManager),

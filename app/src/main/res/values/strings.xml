@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">Azad Launcher</string>
     <string name="home_title">Apps</string>
-    <string name="home_subtitle">Your installed apps, ready to launch.</string>
+    <string name="home_subtitle">Open an app or long-press it to manage favorites.</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="favorites_empty">Long-press an app below to pin it here.</string>
+    <string name="app_pinned">%1$s pinned</string>
+    <string name="app_unpinned">%1$s unpinned</string>
     <string name="search_apps">Search apps</string>
     <string name="no_apps_found">No matching apps</string>
 </resources>
