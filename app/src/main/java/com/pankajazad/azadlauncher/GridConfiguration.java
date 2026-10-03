@@ -8,7 +8,7 @@ final class GridConfiguration {
     private GridConfiguration() { }
 
     static int resolveColumns(int storedColumns, int screenWidthDp) {
-        if (storedColumns >= MIN_COLUMNS && storedColumns <= MAX_COLUMNS) {
+        if (isSelectableColumnCount(storedColumns)) {
             return storedColumns;
         }
         if (screenWidthDp >= 840) {
@@ -18,6 +18,14 @@ final class GridConfiguration {
             return 6;
         }
         return 4;
+    }
+
+    static boolean isValidPreference(int columns) {
+        return columns == AUTOMATIC || isSelectableColumnCount(columns);
+    }
+
+    private static boolean isSelectableColumnCount(int columns) {
+        return columns >= MIN_COLUMNS && columns <= MAX_COLUMNS;
     }
 
     static int spinnerIndex(int storedColumns) {

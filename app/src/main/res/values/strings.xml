@@ -17,6 +17,14 @@
     <string name="hidden_apps">Hidden apps</string>
     <string name="hidden_apps_description">Checked apps are omitted from the app drawer and favorites.</string>
     <string name="hide_app">Hide app</string>
+    <string name="backup_and_restore">Backup and restore</string>
+    <string name="backup_description">Save or restore favorites, hidden apps, and display preferences.</string>
+    <string name="export_settings">Export settings</string>
+    <string name="import_settings">Import settings</string>
+    <string name="backup_exported">Backup exported</string>
+    <string name="backup_export_failed">Could not export backup</string>
+    <string name="backup_imported">Backup restored</string>
+    <string name="backup_import_failed">This backup could not be restored</string>
     <string name="done">Done</string>
 
     <string-array name="grid_column_options">

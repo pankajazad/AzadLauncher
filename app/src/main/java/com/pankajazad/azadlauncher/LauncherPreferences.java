@@ -51,4 +51,21 @@ final class LauncherPreferences {
     void setShowAppLabels(boolean showLabels) {
         preferences.edit().putBoolean(SHOW_LABELS_KEY, showLabels).apply();
     }
+
+    LauncherBackupData backupData() {
+        return new LauncherBackupData(
+                gridColumns(),
+                showAppLabels(),
+                favoriteAppIds(),
+                hiddenAppIds());
+    }
+
+    void restore(LauncherBackupData backupData) {
+        preferences.edit()
+                .putInt(GRID_COLUMNS_KEY, backupData.gridColumns())
+                .putBoolean(SHOW_LABELS_KEY, backupData.showAppLabels())
+                .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
+                .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))
+                .apply();
+    }
 }
