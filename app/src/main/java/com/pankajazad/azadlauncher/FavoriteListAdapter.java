@@ -11,7 +11,9 @@ import com.pankajazad.azadlauncher.databinding.ItemFavoriteAppBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter.FavoriteViewHolder> {
     interface DragStarter {
@@ -28,6 +30,7 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
     private DragStarter dragStarter = holder -> { };
     private boolean showLabels = true;
     private int iconSizeDp = IconSizeConfiguration.iconSizeDp(IconSizeConfiguration.STANDARD);
+    private Set<String> notificationPackages = Collections.emptySet();
 
     FavoriteListAdapter(AppActionListener listener, ReorderListener reorderListener) {
         this.listener = listener;
@@ -50,6 +53,14 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
     void setIconSizeDp(int iconSizeDp) {
         if (this.iconSizeDp != iconSizeDp) {
             this.iconSizeDp = iconSizeDp;
+            notifyDataSetChanged();
+        }
+    }
+
+    void setNotificationPackages(Set<String> notificationPackages) {
+        Set<String> updatedPackages = new HashSet<>(notificationPackages);
+        if (!this.notificationPackages.equals(updatedPackages)) {
+            this.notificationPackages = updatedPackages;
             notifyDataSetChanged();
         }
     }
@@ -91,9 +102,14 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
         iconLayout.height = iconSizePixels;
         holder.binding.favoriteIcon.setLayoutParams(iconLayout);
         holder.binding.favoriteIcon.setImageDrawable(app.getIcon());
+        boolean hasNotification = notificationPackages.contains(app.getPackageName());
+        holder.binding.notificationDot.setVisibility(hasNotification ? View.VISIBLE : View.GONE);
         holder.binding.favoriteLabel.setText(app.getLabel());
         holder.binding.favoriteLabel.setVisibility(showLabels ? View.VISIBLE : View.GONE);
-        holder.binding.getRoot().setContentDescription(app.getLabel());
+        holder.binding.getRoot().setContentDescription(hasNotification
+                ? holder.binding.getRoot().getContext().getString(
+                        R.string.app_with_notification, app.getLabel())
+                : app.getLabel());
         holder.binding.getRoot().setOnClickListener(view -> listener.onOpenApp(app));
         holder.binding.getRoot().setOnLongClickListener(view -> listener.onLongPressApp(app));
         holder.binding.dragHandle.setContentDescription(

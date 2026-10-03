@@ -18,6 +18,11 @@
     <string name="show_app_labels">Show app labels</string>
     <string name="appearance">Appearance</string>
     <string name="manage_hidden_apps">Manage hidden apps</string>
+    <string name="notification_dots">Notification dots</string>
+    <string name="notification_dots_description">Show a dot on apps with active notifications. Android notification access must be granted explicitly.</string>
+    <string name="manage_notification_access">Manage notification access</string>
+    <string name="notification_access_service">Azad Launcher notification dots</string>
+    <string name="app_with_notification">%1$s, notification available</string>
     <string name="hidden_apps">Hidden apps</string>
     <string name="hidden_apps_description">Checked apps are omitted from the app drawer and favorites.</string>
     <string name="hide_app">Hide app</string>

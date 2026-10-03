@@ -11,6 +11,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Configurable app-grid columns and app-label visibility
 - System, light, and dark appearance modes
 - Compact, standard, and large app-icon sizes
+- Notification dots with explicit system permission
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings
 - Unit-test, lint, and debug-APK build gates
@@ -23,6 +24,5 @@ This backlog tracks original, independently designed launcher capabilities.
 - Compatible icon packs
 - Drawer groups
 - Configurable gestures and accessibility actions
-- Notification dots with explicit user permission
 - Optional contextual cards and expanded search providers
 - Android 16 and Android 17 S24+-sized emulator validation

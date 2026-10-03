@@ -3,6 +3,7 @@ package com.pankajazad.azadlauncher;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -102,6 +103,8 @@ public final class SettingsActivity extends AppCompatActivity {
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
         binding.manageHiddenApps.setOnClickListener(
                 view -> startActivity(new Intent(this, HiddenAppsActivity.class)));
+        binding.notificationAccess.setOnClickListener(
+                view -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)));
         binding.exportSettings.setOnClickListener(
                 view -> createBackupLauncher.launch("azad-launcher-backup.azad"));
         binding.importSettings.setOnClickListener(

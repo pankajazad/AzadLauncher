@@ -1,6 +1,9 @@
 package com.pankajazad.azadlauncher;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -8,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +40,12 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
+    private final BroadcastReceiver notificationDotsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            applyNotificationDots();
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,6 +104,23 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ContextCompat.registerReceiver(
+                this,
+                notificationDotsReceiver,
+                new IntentFilter(LauncherNotificationListener.ACTION_NOTIFICATION_DOTS_CHANGED),
+                ContextCompat.RECEIVER_NOT_EXPORTED);
+        applyNotificationDots();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(notificationDotsReceiver);
+        super.onStop();
+    }
+
     private void applyDisplayPreferences() {
         int columns = GridConfiguration.resolveColumns(
                 preferences.gridColumns(),
@@ -107,6 +135,19 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         int iconSizeDp = IconSizeConfiguration.iconSizeDp(preferences.iconSize());
         appListAdapter.setIconSizeDp(iconSizeDp);
         favoriteListAdapter.setIconSizeDp(iconSizeDp);
+        applyNotificationDots();
+    }
+
+    private void applyNotificationDots() {
+        if (preferences == null || appListAdapter == null || favoriteListAdapter == null) {
+            return;
+        }
+        boolean accessGranted = NotificationManagerCompat.getEnabledListenerPackages(this)
+                .contains(getPackageName());
+        Set<String> packages = NotificationDotState.visiblePackages(
+                accessGranted, preferences.notificationDotPackages());
+        appListAdapter.setNotificationPackages(packages);
+        favoriteListAdapter.setNotificationPackages(packages);
     }
 
     private void loadApps() {

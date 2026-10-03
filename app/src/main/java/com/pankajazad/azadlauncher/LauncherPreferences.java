@@ -18,6 +18,7 @@ final class LauncherPreferences {
     private static final String SHOW_LABELS_KEY = "show_app_labels";
     private static final String THEME_MODE_KEY = "theme_mode";
     private static final String ICON_SIZE_KEY = "icon_size";
+    private static final String NOTIFICATION_DOT_PACKAGES_KEY = "notification_dot_packages";
 
     private final SharedPreferences preferences;
 
@@ -90,6 +91,17 @@ final class LauncherPreferences {
 
     void setIconSize(int iconSize) {
         preferences.edit().putInt(ICON_SIZE_KEY, iconSize).apply();
+    }
+
+    Set<String> notificationDotPackages() {
+        return new HashSet<>(preferences.getStringSet(
+                NOTIFICATION_DOT_PACKAGES_KEY, Collections.emptySet()));
+    }
+
+    void setNotificationDotPackages(Set<String> packageNames) {
+        preferences.edit()
+                .putStringSet(NOTIFICATION_DOT_PACKAGES_KEY, new HashSet<>(packageNames))
+                .apply();
     }
 
     LauncherBackupData backupData() {

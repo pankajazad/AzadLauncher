@@ -1,3 +1,4 @@
 <resources>
     <color name="launcher_background">#121318</color>
+    <color name="notification_dot">#FFB4AB</color>
 </resources>
