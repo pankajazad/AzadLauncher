@@ -18,9 +18,14 @@ final class AppFilter {
     }
 
     static List<AppEntry> filter(List<AppEntry> apps, String query) {
+        return filter(apps, query, DrawerGroupConfiguration.ALL);
+    }
+
+    static List<AppEntry> filter(List<AppEntry> apps, String query, int drawerGroup) {
         List<AppEntry> filtered = new ArrayList<>();
         for (AppEntry app : apps) {
-            if (matches(app.getLabel(), app.getPackageName(), query)) {
+            if (DrawerGroupConfiguration.includes(drawerGroup, app.getDrawerGroup())
+                    && matches(app.getLabel(), app.getPackageName(), query)) {
                 filtered.add(app);
             }
         }

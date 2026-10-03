@@ -9,6 +9,7 @@
     <string name="reorder_app">Press and hold to reorder app</string>
     <string name="reorder_named_app">Press and hold to reorder %1$s</string>
     <string name="search_apps">Search apps</string>
+    <string name="drawer_group">App group</string>
     <string name="no_apps_found">No matching apps</string>
     <string name="customize">Customize</string>
     <string name="customize_launcher">Customize launcher</string>
@@ -79,5 +80,14 @@
         <item>Disabled</item>
         <item>DuckDuckGo</item>
         <item>Google</item>
+    </string-array>
+
+    <string-array name="drawer_group_options">
+        <item>All apps</item>
+        <item>Games</item>
+        <item>Productivity</item>
+        <item>Social</item>
+        <item>Media</item>
+        <item>Other</item>
     </string-array>
 </resources>

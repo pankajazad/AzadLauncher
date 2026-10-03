@@ -36,6 +36,8 @@ final class LaunchableAppRepository {
                     component.flattenToString(),
                     info.loadLabel(packageManager).toString(),
                     component.getPackageName(),
+                    DrawerGroupConfiguration.fromApplicationCategory(
+                            info.activityInfo.applicationInfo.category),
                     info.loadIcon(packageManager),
                     launchIntent));
         }

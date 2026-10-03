@@ -15,6 +15,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Configurable swipe-down action and accessible search shortcut
 - Optional DuckDuckGo or Google web-search handoff
 - Optional localized date and battery context card
+- Persistent category-based drawer groups
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings
 - Unit-test, lint, and debug-APK build gates
@@ -25,5 +26,4 @@ This backlog tracks original, independently designed launcher capabilities.
 - App folders and drawer organization
 - Android widget hosting and placement
 - Compatible icon packs
-- Drawer groups
 - Android 16 and Android 17 S24+-sized emulator validation

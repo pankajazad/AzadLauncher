@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -116,10 +118,29 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         binding.contextCard.setOnClickListener(view -> openCalendar());
         binding.webSearch.setOnClickListener(
                 view -> openWebSearch(binding.appSearch.getQuery().toString()));
+        ArrayAdapter<CharSequence> drawerGroupAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.drawer_group_options,
+                android.R.layout.simple_spinner_item);
+        drawerGroupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.drawerGroup.setAdapter(drawerGroupAdapter);
+        binding.drawerGroup.setSelection(
+                DrawerGroupConfiguration.spinnerIndex(preferences.drawerGroup()));
+        binding.drawerGroup.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferences.setDrawerGroup(
+                        DrawerGroupConfiguration.preferenceForSpinnerIndex(position));
+                refreshAppResults();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return true; }
             @Override public boolean onQueryTextChange(String newText) {
-                displayApps(AppFilter.filter(visibleApps(), newText));
+                refreshAppResults();
                 updateWebSearchButton(newText);
                 return true;
             }
@@ -331,9 +352,16 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 appsLoaded = true;
                 removeUnavailableSavedApps();
                 displayFavorites();
-                displayApps(AppFilter.filter(visibleApps(), binding.appSearch.getQuery().toString()));
+                refreshAppResults();
             });
         });
+    }
+
+    private void refreshAppResults() {
+        displayApps(AppFilter.filter(
+                visibleApps(),
+                binding.appSearch.getQuery().toString(),
+                preferences.drawerGroup()));
     }
 
     private void removeUnavailableSavedApps() {

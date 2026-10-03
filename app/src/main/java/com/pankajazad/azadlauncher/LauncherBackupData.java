@@ -14,6 +14,7 @@ final class LauncherBackupData {
     private final int swipeDownAction;
     private final int webSearchProvider;
     private final boolean showContextCard;
+    private final int drawerGroup;
     private final Set<String> favoriteAppIds;
     private final Set<String> hiddenAppIds;
 
@@ -25,6 +26,7 @@ final class LauncherBackupData {
             int swipeDownAction,
             int webSearchProvider,
             boolean showContextCard,
+            int drawerGroup,
             Set<String> favoriteAppIds,
             Set<String> hiddenAppIds) {
         this.gridColumns = gridColumns;
@@ -34,6 +36,7 @@ final class LauncherBackupData {
         this.swipeDownAction = swipeDownAction;
         this.webSearchProvider = webSearchProvider;
         this.showContextCard = showContextCard;
+        this.drawerGroup = drawerGroup;
         this.favoriteAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(favoriteAppIds));
         this.hiddenAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(hiddenAppIds));
     }
@@ -45,6 +48,7 @@ final class LauncherBackupData {
     int swipeDownAction() { return swipeDownAction; }
     int webSearchProvider() { return webSearchProvider; }
     boolean showContextCard() { return showContextCard; }
+    int drawerGroup() { return drawerGroup; }
     Set<String> favoriteAppIds() { return favoriteAppIds; }
     Set<String> hiddenAppIds() { return hiddenAppIds; }
 }

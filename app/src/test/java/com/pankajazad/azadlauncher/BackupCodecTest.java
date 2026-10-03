@@ -23,6 +23,7 @@ public class BackupCodecTest {
                 GestureActionConfiguration.OPEN_SETTINGS,
                 WebSearchProvider.DUCKDUCKGO,
                 false,
+                DrawerGroupConfiguration.PRODUCTIVITY,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -35,6 +36,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SETTINGS, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
         assertFalse(decoded.showContextCard());
+        assertEquals(DrawerGroupConfiguration.PRODUCTIVITY, decoded.drawerGroup());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -52,6 +54,7 @@ public class BackupCodecTest {
                 GestureActionConfiguration.OPEN_SEARCH,
                 WebSearchProvider.DISABLED,
                 true,
+                DrawerGroupConfiguration.ALL,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -64,6 +67,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
+        assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
@@ -97,6 +101,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
+        assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
     }
 
     @Test
@@ -140,6 +145,17 @@ public class BackupCodecTest {
             fail("Expected invalid context card preference to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("context card"));
+        }
+    }
+
+    @Test
+    public void invalidDrawerGroupIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\ndrawerGroup=9\n");
+            fail("Expected invalid drawer group to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("drawer group"));
         }
     }
 }

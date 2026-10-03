@@ -21,6 +21,7 @@ final class BackupCodec {
         backup.append("swipeDownAction=").append(data.swipeDownAction()).append('\n');
         backup.append("webSearchProvider=").append(data.webSearchProvider()).append('\n');
         backup.append("showContextCard=").append(data.showContextCard()).append('\n');
+        backup.append("drawerGroup=").append(data.drawerGroup()).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
@@ -42,6 +43,7 @@ final class BackupCodec {
         int swipeDownAction = GestureActionConfiguration.OPEN_SEARCH;
         int webSearchProvider = WebSearchProvider.DISABLED;
         boolean showContextCard = true;
+        int drawerGroup = DrawerGroupConfiguration.ALL;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
@@ -85,6 +87,9 @@ final class BackupCodec {
                     }
                     showContextCard = Boolean.parseBoolean(value);
                     break;
+                case "drawerGroup":
+                    drawerGroup = parseInteger(value, "drawer group");
+                    break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
                     break;
@@ -117,6 +122,9 @@ final class BackupCodec {
         if (!WebSearchProvider.isValidPreference(webSearchProvider)) {
             throw new IllegalArgumentException("Invalid web search provider");
         }
+        if (!DrawerGroupConfiguration.isValidPreference(drawerGroup)) {
+            throw new IllegalArgumentException("Invalid drawer group");
+        }
         return new LauncherBackupData(
                 gridColumns,
                 showAppLabels,
@@ -125,6 +133,7 @@ final class BackupCodec {
                 swipeDownAction,
                 webSearchProvider,
                 showContextCard,
+                drawerGroup,
                 favorites,
                 hidden);
     }
