@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Azad Launcher</string>
+    <string name="home_title">Apps</string>
+    <string name="home_subtitle">Your installed apps, ready to launch.</string>
+    <string name="search_apps">Search apps</string>
+    <string name="no_apps_found">No matching apps</string>
+</resources>
