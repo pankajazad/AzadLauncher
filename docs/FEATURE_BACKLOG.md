@@ -8,6 +8,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Responsive searchable app grid
 - Persistent favorites with long-press pin and unpin
 - Configurable app-grid columns and app-label visibility
+- Searchable hidden-app management
 - Unit-test, lint, and debug-APK build gates
 
 ## Planned
@@ -16,7 +17,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - App folders and drawer organization
 - Android widget hosting and placement
 - Icon size, themes, and compatible icon packs
-- Hidden apps and drawer groups
+- Drawer groups
 - Configurable gestures and accessibility actions
 - Notification dots with explicit user permission
 - Local backup and restore

@@ -13,6 +13,10 @@
     <string name="customize_description">Choose how apps are arranged and labeled.</string>
     <string name="grid_columns">App grid columns</string>
     <string name="show_app_labels">Show app labels</string>
+    <string name="manage_hidden_apps">Manage hidden apps</string>
+    <string name="hidden_apps">Hidden apps</string>
+    <string name="hidden_apps_description">Checked apps are omitted from the app drawer and favorites.</string>
+    <string name="hide_app">Hide app</string>
     <string name="done">Done</string>
 
     <string-array name="grid_column_options">

@@ -10,6 +10,7 @@ import java.util.Set;
 final class LauncherPreferences {
     private static final String PREFERENCES_NAME = "launcher_preferences";
     private static final String FAVORITE_APP_IDS_KEY = "favorite_app_ids";
+    private static final String HIDDEN_APP_IDS_KEY = "hidden_app_ids";
     private static final String GRID_COLUMNS_KEY = "grid_columns";
     private static final String SHOW_LABELS_KEY = "show_app_labels";
 
@@ -25,6 +26,14 @@ final class LauncherPreferences {
 
     void setFavoriteAppIds(Set<String> appIds) {
         preferences.edit().putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(appIds)).apply();
+    }
+
+    Set<String> hiddenAppIds() {
+        return new HashSet<>(preferences.getStringSet(HIDDEN_APP_IDS_KEY, Collections.emptySet()));
+    }
+
+    void setHiddenAppIds(Set<String> appIds) {
+        preferences.edit().putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(appIds)).apply();
     }
 
     int gridColumns() {

@@ -1,5 +1,6 @@
 package com.pankajazad.azadlauncher;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +42,8 @@ public final class SettingsActivity extends AppCompatActivity {
         binding.showLabels.setChecked(preferences.showAppLabels());
         binding.showLabels.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
+        binding.manageHiddenApps.setOnClickListener(
+                view -> startActivity(new Intent(this, HiddenAppsActivity.class)));
         binding.done.setOnClickListener(view -> finish());
     }
 }

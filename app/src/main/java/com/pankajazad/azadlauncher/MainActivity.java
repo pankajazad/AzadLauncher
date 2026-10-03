@@ -27,6 +27,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private AppListAdapter appListAdapter;
     private FavoriteListAdapter favoriteListAdapter;
     private FavoriteApps favoriteApps;
+    private HiddenApps hiddenApps;
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
@@ -40,6 +41,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         favoriteListAdapter = new FavoriteListAdapter(this);
         preferences = new LauncherPreferences(this);
         favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
+        hiddenApps = new HiddenApps(preferences.hiddenAppIds());
         binding.appList.setLayoutManager(new GridLayoutManager(this, spanCount()));
         binding.appList.setAdapter(appListAdapter);
         binding.favoriteList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -49,7 +51,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return true; }
             @Override public boolean onQueryTextChange(String newText) {
-                displayApps(AppFilter.filter(allApps, newText));
+                displayApps(AppFilter.filter(visibleApps(), newText));
                 return true;
             }
         });
@@ -84,14 +86,14 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             runOnUiThread(() -> {
                 allApps = loadedApps;
                 appsLoaded = true;
-                removeUnavailableFavorites();
+                removeUnavailableSavedApps();
                 displayFavorites();
-                displayApps(AppFilter.filter(allApps, binding.appSearch.getQuery().toString()));
+                displayApps(AppFilter.filter(visibleApps(), binding.appSearch.getQuery().toString()));
             });
         });
     }
 
-    private void removeUnavailableFavorites() {
+    private void removeUnavailableSavedApps() {
         Set<String> availableAppIds = new HashSet<>();
         for (AppEntry app : allApps) {
             availableAppIds.add(app.getId());
@@ -99,12 +101,25 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         if (favoriteApps.retainAvailable(availableAppIds)) {
             saveFavorites();
         }
+        if (hiddenApps.retainAvailable(availableAppIds)) {
+            saveHiddenApps();
+        }
+    }
+
+    private List<AppEntry> visibleApps() {
+        List<AppEntry> visible = new ArrayList<>();
+        for (AppEntry app : allApps) {
+            if (!hiddenApps.contains(app.getId())) {
+                visible.add(app);
+            }
+        }
+        return visible;
     }
 
     private void displayFavorites() {
         List<AppEntry> favorites = new ArrayList<>();
         for (AppEntry app : allApps) {
-            if (favoriteApps.contains(app.getId())) {
+            if (favoriteApps.contains(app.getId()) && !hiddenApps.contains(app.getId())) {
                 favorites.add(app);
             }
         }
@@ -116,6 +131,10 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
 
     private void saveFavorites() {
         preferences.setFavoriteAppIds(favoriteApps.snapshot());
+    }
+
+    private void saveHiddenApps() {
+        preferences.setHiddenAppIds(hiddenApps.snapshot());
     }
 
     private void displayApps(List<AppEntry> apps) {

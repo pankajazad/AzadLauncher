@@ -45,6 +45,14 @@
             android:text="@string/show_app_labels" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/manage_hidden_apps"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/manage_hidden_apps" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
