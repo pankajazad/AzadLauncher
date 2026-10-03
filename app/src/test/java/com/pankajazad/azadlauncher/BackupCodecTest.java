@@ -22,6 +22,7 @@ public class BackupCodecTest {
                 IconSizeConfiguration.LARGE,
                 GestureActionConfiguration.OPEN_SETTINGS,
                 WebSearchProvider.DUCKDUCKGO,
+                false,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -33,6 +34,7 @@ public class BackupCodecTest {
         assertEquals(IconSizeConfiguration.LARGE, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SETTINGS, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
+        assertFalse(decoded.showContextCard());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -49,6 +51,7 @@ public class BackupCodecTest {
                 IconSizeConfiguration.STANDARD,
                 GestureActionConfiguration.OPEN_SEARCH,
                 WebSearchProvider.DISABLED,
+                true,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -60,6 +63,7 @@ public class BackupCodecTest {
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
+        assertTrue(decoded.showContextCard());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
@@ -92,6 +96,7 @@ public class BackupCodecTest {
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
+        assertTrue(decoded.showContextCard());
     }
 
     @Test
@@ -124,6 +129,17 @@ public class BackupCodecTest {
             fail("Expected invalid web provider to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("web search"));
+        }
+    }
+
+    @Test
+    public void invalidContextCardPreferenceIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\nshowContextCard=yes\n");
+            fail("Expected invalid context card preference to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("context card"));
         }
     }
 }

@@ -21,6 +21,7 @@ final class LauncherPreferences {
     private static final String NOTIFICATION_DOT_PACKAGES_KEY = "notification_dot_packages";
     private static final String SWIPE_DOWN_ACTION_KEY = "swipe_down_action";
     private static final String WEB_SEARCH_PROVIDER_KEY = "web_search_provider";
+    private static final String SHOW_CONTEXT_CARD_KEY = "show_context_card";
 
     private final SharedPreferences preferences;
 
@@ -130,6 +131,14 @@ final class LauncherPreferences {
         preferences.edit().putInt(WEB_SEARCH_PROVIDER_KEY, provider).apply();
     }
 
+    boolean showContextCard() {
+        return preferences.getBoolean(SHOW_CONTEXT_CARD_KEY, true);
+    }
+
+    void setShowContextCard(boolean showContextCard) {
+        preferences.edit().putBoolean(SHOW_CONTEXT_CARD_KEY, showContextCard).apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
@@ -138,6 +147,7 @@ final class LauncherPreferences {
                 iconSize(),
                 swipeDownAction(),
                 webSearchProvider(),
+                showContextCard(),
                 favoriteAppIds(),
                 hiddenAppIds());
     }
@@ -150,6 +160,7 @@ final class LauncherPreferences {
                 .putInt(ICON_SIZE_KEY, backupData.iconSize())
                 .putInt(SWIPE_DOWN_ACTION_KEY, backupData.swipeDownAction())
                 .putInt(WEB_SEARCH_PROVIDER_KEY, backupData.webSearchProvider())
+                .putBoolean(SHOW_CONTEXT_CARD_KEY, backupData.showContextCard())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))

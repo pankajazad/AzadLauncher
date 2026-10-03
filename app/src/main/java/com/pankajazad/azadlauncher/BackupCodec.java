@@ -20,6 +20,7 @@ final class BackupCodec {
         backup.append("iconSize=").append(data.iconSize()).append('\n');
         backup.append("swipeDownAction=").append(data.swipeDownAction()).append('\n');
         backup.append("webSearchProvider=").append(data.webSearchProvider()).append('\n');
+        backup.append("showContextCard=").append(data.showContextCard()).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
@@ -40,6 +41,7 @@ final class BackupCodec {
         int iconSize = IconSizeConfiguration.STANDARD;
         int swipeDownAction = GestureActionConfiguration.OPEN_SEARCH;
         int webSearchProvider = WebSearchProvider.DISABLED;
+        boolean showContextCard = true;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
@@ -76,6 +78,12 @@ final class BackupCodec {
                     break;
                 case "webSearchProvider":
                     webSearchProvider = parseInteger(value, "web search provider");
+                    break;
+                case "showContextCard":
+                    if (!"true".equals(value) && !"false".equals(value)) {
+                        throw new IllegalArgumentException("Invalid context card preference");
+                    }
+                    showContextCard = Boolean.parseBoolean(value);
                     break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
@@ -116,6 +124,7 @@ final class BackupCodec {
                 iconSize,
                 swipeDownAction,
                 webSearchProvider,
+                showContextCard,
                 favorites,
                 hidden);
     }

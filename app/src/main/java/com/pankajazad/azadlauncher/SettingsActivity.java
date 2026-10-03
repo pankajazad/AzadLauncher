@@ -135,6 +135,8 @@ public final class SettingsActivity extends AppCompatActivity {
 
         binding.showLabels.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
+        binding.showContextCard.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> preferences.setShowContextCard(isChecked));
         binding.manageHiddenApps.setOnClickListener(
                 view -> startActivity(new Intent(this, HiddenAppsActivity.class)));
         binding.notificationAccess.setOnClickListener(
@@ -150,6 +152,7 @@ public final class SettingsActivity extends AppCompatActivity {
     private void refreshControls() {
         binding.gridColumns.setSelection(GridConfiguration.spinnerIndex(preferences.gridColumns()));
         binding.showLabels.setChecked(preferences.showAppLabels());
+        binding.showContextCard.setChecked(preferences.showContextCard());
         binding.themeMode.setSelection(ThemeConfiguration.spinnerIndex(preferences.themeMode()));
         binding.iconSize.setSelection(IconSizeConfiguration.spinnerIndex(preferences.iconSize()));
         binding.swipeDownAction.setSelection(

@@ -16,6 +16,12 @@
     <string name="grid_columns">App grid columns</string>
     <string name="icon_size">Icon size</string>
     <string name="show_app_labels">Show app labels</string>
+    <string name="show_context_card">Show date and battery card</string>
+    <string name="context_card_description">%1$s. %2$s. Open calendar</string>
+    <string name="battery_charging">%1$d%% battery · Charging</string>
+    <string name="battery_remaining">%1$d%% battery</string>
+    <string name="battery_status_unavailable">Battery status unavailable</string>
+    <string name="calendar_unavailable">No calendar app is available</string>
     <string name="swipe_down_action">Swipe down action</string>
     <string name="accessibility_open_search">Focus app search</string>
     <string name="web_search_provider">Web search provider</string>

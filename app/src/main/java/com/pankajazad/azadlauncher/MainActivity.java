@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.BatteryManager;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.text.DateFormat;
+import java.util.Date;
 
 public final class MainActivity extends AppCompatActivity implements AppActionListener {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -50,10 +53,18 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private float gestureStartY;
     private long gestureStartTime;
     private boolean trackingTouchGesture;
+    private int batteryPercentage = -1;
+    private boolean batteryCharging;
     private final BroadcastReceiver notificationDotsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             applyNotificationDots();
+        }
+    };
+    private final BroadcastReceiver contextCardReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateContextCard(intent);
         }
     };
 
@@ -102,6 +113,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         favoriteListAdapter.setDragStarter(favoriteTouchHelper::startDrag);
         binding.openSettings.setOnClickListener(
                 view -> startActivity(new Intent(this, SettingsActivity.class)));
+        binding.contextCard.setOnClickListener(view -> openCalendar());
         binding.webSearch.setOnClickListener(
                 view -> openWebSearch(binding.appSearch.getQuery().toString()));
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -177,12 +189,23 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 notificationDotsReceiver,
                 new IntentFilter(LauncherNotificationListener.ACTION_NOTIFICATION_DOTS_CHANGED),
                 ContextCompat.RECEIVER_NOT_EXPORTED);
+        IntentFilter contextFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        contextFilter.addAction(Intent.ACTION_DATE_CHANGED);
+        contextFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        contextFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        Intent batteryIntent = ContextCompat.registerReceiver(
+                this,
+                contextCardReceiver,
+                contextFilter,
+                ContextCompat.RECEIVER_EXPORTED);
         applyNotificationDots();
+        updateContextCard(batteryIntent);
     }
 
     @Override
     protected void onStop() {
         unregisterReceiver(notificationDotsReceiver);
+        unregisterReceiver(contextCardReceiver);
         super.onStop();
     }
 
@@ -202,6 +225,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         favoriteListAdapter.setIconSizeDp(iconSizeDp);
         applyNotificationDots();
         updateWebSearchButton(binding.appSearch.getQuery().toString());
+        updateContextCard(null);
     }
 
     private void applyNotificationDots() {
@@ -258,6 +282,44 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (ActivityNotFoundException exception) {
             Toast.makeText(this, R.string.web_search_unavailable, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateContextCard(@Nullable Intent intent) {
+        boolean visible = preferences.showContextCard();
+        binding.contextCard.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (!visible) {
+            return;
+        }
+        if (intent != null && Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
+            batteryPercentage = BatteryStatus.percentage(
+                    intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1),
+                    intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1));
+            batteryCharging = BatteryStatus.isCharging(
+                    intent.getIntExtra(
+                            BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN));
+        }
+        String formattedDate = DateFormat.getDateInstance(DateFormat.FULL).format(new Date());
+        binding.contextDate.setText(formattedDate);
+        String batteryText;
+        if (batteryPercentage < 0) {
+            batteryText = getString(R.string.battery_status_unavailable);
+        } else {
+            batteryText = getString(
+                    batteryCharging ? R.string.battery_charging : R.string.battery_remaining,
+                    batteryPercentage);
+        }
+        binding.contextBattery.setText(batteryText);
+        binding.contextCard.setContentDescription(getString(
+                R.string.context_card_description, formattedDate, batteryText));
+    }
+
+    private void openCalendar() {
+        try {
+            startActivity(Intent.makeMainSelectorActivity(
+                    Intent.ACTION_MAIN, Intent.CATEGORY_APP_CALENDAR));
+        } catch (ActivityNotFoundException exception) {
+            Toast.makeText(this, R.string.calendar_unavailable, Toast.LENGTH_SHORT).show();
         }
     }
 
