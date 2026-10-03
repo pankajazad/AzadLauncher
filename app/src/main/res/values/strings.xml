@@ -8,4 +8,19 @@
     <string name="app_unpinned">%1$s unpinned</string>
     <string name="search_apps">Search apps</string>
     <string name="no_apps_found">No matching apps</string>
+    <string name="customize">Customize</string>
+    <string name="customize_launcher">Customize launcher</string>
+    <string name="customize_description">Choose how apps are arranged and labeled.</string>
+    <string name="grid_columns">App grid columns</string>
+    <string name="show_app_labels">Show app labels</string>
+    <string name="done">Done</string>
+
+    <string-array name="grid_column_options">
+        <item>Automatic</item>
+        <item>3 columns</item>
+        <item>4 columns</item>
+        <item>5 columns</item>
+        <item>6 columns</item>
+        <item>7 columns</item>
+    </string-array>
 </resources>

@@ -1,7 +1,7 @@
 package com.pankajazad.azadlauncher;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,14 +22,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class MainActivity extends AppCompatActivity implements AppActionListener {
-    private static final String PREFERENCES_NAME = "launcher_preferences";
-    private static final String FAVORITE_APP_IDS_KEY = "favorite_app_ids";
-
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private ActivityMainBinding binding;
     private AppListAdapter appListAdapter;
     private FavoriteListAdapter favoriteListAdapter;
     private FavoriteApps favoriteApps;
+    private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
 
@@ -40,12 +38,14 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         setContentView(binding.getRoot());
         appListAdapter = new AppListAdapter(this);
         favoriteListAdapter = new FavoriteListAdapter(this);
-        SharedPreferences preferences = getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE);
-        favoriteApps = new FavoriteApps(preferences.getStringSet(FAVORITE_APP_IDS_KEY, Collections.emptySet()));
+        preferences = new LauncherPreferences(this);
+        favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
         binding.appList.setLayoutManager(new GridLayoutManager(this, spanCount()));
         binding.appList.setAdapter(appListAdapter);
         binding.favoriteList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.favoriteList.setAdapter(favoriteListAdapter);
+        binding.openSettings.setOnClickListener(
+                view -> startActivity(new Intent(this, SettingsActivity.class)));
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return true; }
             @Override public boolean onQueryTextChange(String newText) {
@@ -59,9 +59,23 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     @Override
     protected void onResume() {
         super.onResume();
+        applyDisplayPreferences();
         if (appsLoaded) {
             loadApps();
         }
+    }
+
+    private void applyDisplayPreferences() {
+        int columns = GridConfiguration.resolveColumns(
+                preferences.gridColumns(),
+                getResources().getConfiguration().screenWidthDp);
+        GridLayoutManager layoutManager = (GridLayoutManager) binding.appList.getLayoutManager();
+        if (layoutManager != null && layoutManager.getSpanCount() != columns) {
+            layoutManager.setSpanCount(columns);
+        }
+        boolean showLabels = preferences.showAppLabels();
+        appListAdapter.setShowLabels(showLabels);
+        favoriteListAdapter.setShowLabels(showLabels);
     }
 
     private void loadApps() {
@@ -101,10 +115,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void saveFavorites() {
-        getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE)
-                .edit()
-                .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(favoriteApps.snapshot()))
-                .apply();
+        preferences.setFavoriteAppIds(favoriteApps.snapshot());
     }
 
     private void displayApps(List<AppEntry> apps) {
@@ -113,10 +124,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private int spanCount() {
-        int widthDp = getResources().getConfiguration().screenWidthDp;
-        if (widthDp >= 840) return 7;
-        if (widthDp >= 600) return 6;
-        return 4;
+        return GridConfiguration.resolveColumns(
+                preferences.gridColumns(),
+                getResources().getConfiguration().screenWidthDp);
     }
 
     @Override

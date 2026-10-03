@@ -15,6 +15,7 @@ import java.util.List;
 final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHolder> {
     private final List<AppEntry> apps = new ArrayList<>();
     private final AppActionListener listener;
+    private boolean showLabels = true;
 
     AppListAdapter(AppActionListener listener) {
         this.listener = listener;
@@ -24,6 +25,13 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
         apps.clear();
         apps.addAll(newApps);
         notifyDataSetChanged();
+    }
+
+    void setShowLabels(boolean showLabels) {
+        if (this.showLabels != showLabels) {
+            this.showLabels = showLabels;
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -38,6 +46,7 @@ final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHo
         AppEntry app = apps.get(position);
         holder.binding.appIcon.setImageDrawable(app.getIcon());
         holder.binding.appLabel.setText(app.getLabel());
+        holder.binding.appLabel.setVisibility(showLabels ? View.VISIBLE : View.GONE);
         holder.binding.getRoot().setContentDescription(app.getLabel());
         holder.binding.getRoot().setOnClickListener(view -> listener.onOpenApp(app));
         holder.binding.getRoot().setOnLongClickListener(view -> listener.onLongPressApp(app));

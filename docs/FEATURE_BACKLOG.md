@@ -7,14 +7,15 @@ This backlog tracks original, independently designed launcher capabilities.
 - Android Home intent and launchable-app discovery
 - Responsive searchable app grid
 - Persistent favorites with long-press pin and unpin
+- Configurable app-grid columns and app-label visibility
 - Unit-test, lint, and debug-APK build gates
 
 ## Planned
 
-- Draggable workspace pages and configurable grid
+- Draggable workspace pages
 - App folders and drawer organization
 - Android widget hosting and placement
-- Icon size, labels, themes, and compatible icon packs
+- Icon size, themes, and compatible icon packs
 - Hidden apps and drawer groups
 - Configurable gestures and accessibility actions
 - Notification dots with explicit user permission

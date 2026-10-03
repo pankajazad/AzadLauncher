@@ -1,6 +1,7 @@
 package com.pankajazad.azadlauncher;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import java.util.List;
 final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter.FavoriteViewHolder> {
     private final List<AppEntry> apps = new ArrayList<>();
     private final AppActionListener listener;
+    private boolean showLabels = true;
 
     FavoriteListAdapter(AppActionListener listener) {
         this.listener = listener;
@@ -23,6 +25,13 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
         apps.clear();
         apps.addAll(newApps);
         notifyDataSetChanged();
+    }
+
+    void setShowLabels(boolean showLabels) {
+        if (this.showLabels != showLabels) {
+            this.showLabels = showLabels;
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -38,6 +47,7 @@ final class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapter
         AppEntry app = apps.get(position);
         holder.binding.favoriteIcon.setImageDrawable(app.getIcon());
         holder.binding.favoriteLabel.setText(app.getLabel());
+        holder.binding.favoriteLabel.setVisibility(showLabels ? View.VISIBLE : View.GONE);
         holder.binding.getRoot().setContentDescription(app.getLabel());
         holder.binding.getRoot().setOnClickListener(view -> listener.onOpenApp(app));
         holder.binding.getRoot().setOnLongClickListener(view -> listener.onLongPressApp(app));
