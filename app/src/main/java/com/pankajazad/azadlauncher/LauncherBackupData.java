@@ -11,6 +11,7 @@ final class LauncherBackupData {
     private final boolean showAppLabels;
     private final int themeMode;
     private final int iconSize;
+    private final int swipeDownAction;
     private final Set<String> favoriteAppIds;
     private final Set<String> hiddenAppIds;
 
@@ -19,12 +20,14 @@ final class LauncherBackupData {
             boolean showAppLabels,
             int themeMode,
             int iconSize,
+            int swipeDownAction,
             Set<String> favoriteAppIds,
             Set<String> hiddenAppIds) {
         this.gridColumns = gridColumns;
         this.showAppLabels = showAppLabels;
         this.themeMode = themeMode;
         this.iconSize = iconSize;
+        this.swipeDownAction = swipeDownAction;
         this.favoriteAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(favoriteAppIds));
         this.hiddenAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(hiddenAppIds));
     }
@@ -33,6 +36,7 @@ final class LauncherBackupData {
     boolean showAppLabels() { return showAppLabels; }
     int themeMode() { return themeMode; }
     int iconSize() { return iconSize; }
+    int swipeDownAction() { return swipeDownAction; }
     Set<String> favoriteAppIds() { return favoriteAppIds; }
     Set<String> hiddenAppIds() { return hiddenAppIds; }
 }

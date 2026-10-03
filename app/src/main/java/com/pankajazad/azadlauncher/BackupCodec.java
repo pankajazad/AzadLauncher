@@ -18,6 +18,7 @@ final class BackupCodec {
         backup.append("showAppLabels=").append(data.showAppLabels()).append('\n');
         backup.append("themeMode=").append(data.themeMode()).append('\n');
         backup.append("iconSize=").append(data.iconSize()).append('\n');
+        backup.append("swipeDownAction=").append(data.swipeDownAction()).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
@@ -36,6 +37,7 @@ final class BackupCodec {
         Boolean showAppLabels = null;
         int themeMode = ThemeConfiguration.FOLLOW_SYSTEM;
         int iconSize = IconSizeConfiguration.STANDARD;
+        int swipeDownAction = GestureActionConfiguration.OPEN_SEARCH;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
@@ -67,6 +69,9 @@ final class BackupCodec {
                 case "iconSize":
                     iconSize = parseInteger(value, "icon size");
                     break;
+                case "swipeDownAction":
+                    swipeDownAction = parseInteger(value, "swipe down action");
+                    break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
                     break;
@@ -93,8 +98,17 @@ final class BackupCodec {
         if (!IconSizeConfiguration.isValidPreference(iconSize)) {
             throw new IllegalArgumentException("Invalid icon size preference");
         }
+        if (!GestureActionConfiguration.isValidPreference(swipeDownAction)) {
+            throw new IllegalArgumentException("Invalid swipe down action");
+        }
         return new LauncherBackupData(
-                gridColumns, showAppLabels, themeMode, iconSize, favorites, hidden);
+                gridColumns,
+                showAppLabels,
+                themeMode,
+                iconSize,
+                swipeDownAction,
+                favorites,
+                hidden);
     }
 
     private static int parseInteger(String value, String field) {

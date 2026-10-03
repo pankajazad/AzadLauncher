@@ -20,6 +20,7 @@ public class BackupCodecTest {
                 false,
                 ThemeConfiguration.DARK,
                 IconSizeConfiguration.LARGE,
+                GestureActionConfiguration.OPEN_SETTINGS,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -29,6 +30,7 @@ public class BackupCodecTest {
         assertFalse(decoded.showAppLabels());
         assertEquals(ThemeConfiguration.DARK, decoded.themeMode());
         assertEquals(IconSizeConfiguration.LARGE, decoded.iconSize());
+        assertEquals(GestureActionConfiguration.OPEN_SETTINGS, decoded.swipeDownAction());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -43,6 +45,7 @@ public class BackupCodecTest {
                 true,
                 ThemeConfiguration.FOLLOW_SYSTEM,
                 IconSizeConfiguration.STANDARD,
+                GestureActionConfiguration.OPEN_SEARCH,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -52,6 +55,7 @@ public class BackupCodecTest {
         assertTrue(decoded.showAppLabels());
         assertEquals(ThemeConfiguration.FOLLOW_SYSTEM, decoded.themeMode());
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
+        assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
@@ -82,6 +86,7 @@ public class BackupCodecTest {
                 "version=1\ngridColumns=4\nshowAppLabels=true\n");
 
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
+        assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
     }
 
     @Test
@@ -92,6 +97,17 @@ public class BackupCodecTest {
             fail("Expected invalid icon size to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("icon size"));
+        }
+    }
+
+    @Test
+    public void invalidSwipeActionIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\nswipeDownAction=9\n");
+            fail("Expected invalid swipe action to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("swipe down"));
         }
     }
 }

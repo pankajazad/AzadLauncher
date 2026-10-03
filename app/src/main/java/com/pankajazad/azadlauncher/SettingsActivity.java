@@ -99,6 +99,23 @@ public final class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+        ArrayAdapter<CharSequence> swipeActionAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.gesture_action_options,
+                android.R.layout.simple_spinner_item);
+        swipeActionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.swipeDownAction.setAdapter(swipeActionAdapter);
+        binding.swipeDownAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferences.setSwipeDownAction(
+                        GestureActionConfiguration.preferenceForSpinnerIndex(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         binding.showLabels.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
         binding.manageHiddenApps.setOnClickListener(
@@ -118,6 +135,8 @@ public final class SettingsActivity extends AppCompatActivity {
         binding.showLabels.setChecked(preferences.showAppLabels());
         binding.themeMode.setSelection(ThemeConfiguration.spinnerIndex(preferences.themeMode()));
         binding.iconSize.setSelection(IconSizeConfiguration.spinnerIndex(preferences.iconSize()));
+        binding.swipeDownAction.setSelection(
+                GestureActionConfiguration.spinnerIndex(preferences.swipeDownAction()));
     }
 
     private void writeBackup(Uri uri) {

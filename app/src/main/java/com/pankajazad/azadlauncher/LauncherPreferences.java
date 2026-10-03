@@ -19,6 +19,7 @@ final class LauncherPreferences {
     private static final String THEME_MODE_KEY = "theme_mode";
     private static final String ICON_SIZE_KEY = "icon_size";
     private static final String NOTIFICATION_DOT_PACKAGES_KEY = "notification_dot_packages";
+    private static final String SWIPE_DOWN_ACTION_KEY = "swipe_down_action";
 
     private final SharedPreferences preferences;
 
@@ -104,12 +105,25 @@ final class LauncherPreferences {
                 .apply();
     }
 
+    int swipeDownAction() {
+        int storedAction = preferences.getInt(
+                SWIPE_DOWN_ACTION_KEY, GestureActionConfiguration.OPEN_SEARCH);
+        return GestureActionConfiguration.isValidPreference(storedAction)
+                ? storedAction
+                : GestureActionConfiguration.OPEN_SEARCH;
+    }
+
+    void setSwipeDownAction(int action) {
+        preferences.edit().putInt(SWIPE_DOWN_ACTION_KEY, action).apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
                 showAppLabels(),
                 themeMode(),
                 iconSize(),
+                swipeDownAction(),
                 favoriteAppIds(),
                 hiddenAppIds());
     }
@@ -120,6 +134,7 @@ final class LauncherPreferences {
                 .putBoolean(SHOW_LABELS_KEY, backupData.showAppLabels())
                 .putInt(THEME_MODE_KEY, backupData.themeMode())
                 .putInt(ICON_SIZE_KEY, backupData.iconSize())
+                .putInt(SWIPE_DOWN_ACTION_KEY, backupData.swipeDownAction())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))

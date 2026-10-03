@@ -16,6 +16,8 @@
     <string name="grid_columns">App grid columns</string>
     <string name="icon_size">Icon size</string>
     <string name="show_app_labels">Show app labels</string>
+    <string name="swipe_down_action">Swipe down action</string>
+    <string name="accessibility_open_search">Focus app search</string>
     <string name="appearance">Appearance</string>
     <string name="manage_hidden_apps">Manage hidden apps</string>
     <string name="notification_dots">Notification dots</string>
@@ -55,5 +57,11 @@
         <item>Compact</item>
         <item>Standard</item>
         <item>Large</item>
+    </string-array>
+
+    <string-array name="gesture_action_options">
+        <item>Do nothing</item>
+        <item>Search apps</item>
+        <item>Open settings</item>
     </string-array>
 </resources>

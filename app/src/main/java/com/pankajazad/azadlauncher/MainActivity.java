@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -13,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +44,10 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
+    private float gestureStartX;
+    private float gestureStartY;
+    private long gestureStartTime;
+    private boolean trackingTouchGesture;
     private final BroadcastReceiver notificationDotsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -57,6 +65,13 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         preferences = new LauncherPreferences(this);
         favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
         hiddenApps = new HiddenApps(preferences.hiddenAppIds());
+        ViewCompat.addAccessibilityAction(
+                binding.getRoot(),
+                getString(R.string.accessibility_open_search),
+                (view, arguments) -> {
+                    focusAppSearch();
+                    return true;
+                });
         binding.appList.setLayoutManager(new GridLayoutManager(this, spanCount()));
         binding.appList.setAdapter(appListAdapter);
         binding.favoriteList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -93,6 +108,51 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             }
         });
         loadApps();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_TOUCHSCREEN)
+                == InputDevice.SOURCE_TOUCHSCREEN) {
+            trackHomeGesture(event);
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    private void trackHomeGesture(MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                gestureStartX = event.getX();
+                gestureStartY = event.getY();
+                gestureStartTime = event.getEventTime();
+                trackingTouchGesture = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                if (trackingTouchGesture) {
+                    float horizontalDistance = event.getX() - gestureStartX;
+                    float verticalDistance = event.getY() - gestureStartY;
+                    long elapsedMillis = Math.max(1L, event.getEventTime() - gestureStartTime);
+                    float verticalVelocity = verticalDistance * 1000f / elapsedMillis;
+                    float density = getResources().getDisplayMetrics().density;
+                    if (GestureClassifier.isDownwardSwipe(
+                            horizontalDistance,
+                            verticalDistance,
+                            verticalVelocity,
+                            72f * density,
+                            250f * density,
+                            binding.appList.canScrollVertically(-1))) {
+                        performGestureAction(preferences.swipeDownAction());
+                    }
+                }
+                trackingTouchGesture = false;
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                trackingTouchGesture = false;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -148,6 +208,30 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 accessGranted, preferences.notificationDotPackages());
         appListAdapter.setNotificationPackages(packages);
         favoriteListAdapter.setNotificationPackages(packages);
+    }
+
+    private void performGestureAction(int action) {
+        switch (action) {
+            case GestureActionConfiguration.OPEN_SEARCH:
+                focusAppSearch();
+                break;
+            case GestureActionConfiguration.OPEN_SETTINGS:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void focusAppSearch() {
+        binding.appSearch.setIconified(false);
+        View searchInput = binding.appSearch.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchInput.requestFocus();
+        searchInput.post(() -> {
+            InputMethodManager inputMethodManager =
+                    (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(searchInput, 0);
+        });
     }
 
     private void loadApps() {
