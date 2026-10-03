@@ -1,8 +1,7 @@
 # Azad Launcher
 
 Azad Launcher is an original Android home-screen application. It is being built as a
-clean-room project: it does not reuse Nova Launcher source code, assets, branding, or
-proprietary UI.
+clean-room project.
 
 ## Incremental delivery
 
