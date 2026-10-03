@@ -116,6 +116,23 @@ public final class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+        ArrayAdapter<CharSequence> webSearchAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.web_search_provider_options,
+                android.R.layout.simple_spinner_item);
+        webSearchAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.webSearchProvider.setAdapter(webSearchAdapter);
+        binding.webSearchProvider.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferences.setWebSearchProvider(
+                        WebSearchProvider.preferenceForSpinnerIndex(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         binding.showLabels.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
         binding.manageHiddenApps.setOnClickListener(
@@ -137,6 +154,8 @@ public final class SettingsActivity extends AppCompatActivity {
         binding.iconSize.setSelection(IconSizeConfiguration.spinnerIndex(preferences.iconSize()));
         binding.swipeDownAction.setSelection(
                 GestureActionConfiguration.spinnerIndex(preferences.swipeDownAction()));
+        binding.webSearchProvider.setSelection(
+                WebSearchProvider.spinnerIndex(preferences.webSearchProvider()));
     }
 
     private void writeBackup(Uri uri) {

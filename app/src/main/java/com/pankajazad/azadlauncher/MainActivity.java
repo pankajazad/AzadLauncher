@@ -1,9 +1,11 @@
 package com.pankajazad.azadlauncher;
 
 import android.content.BroadcastReceiver;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -100,10 +102,13 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         favoriteListAdapter.setDragStarter(favoriteTouchHelper::startDrag);
         binding.openSettings.setOnClickListener(
                 view -> startActivity(new Intent(this, SettingsActivity.class)));
+        binding.webSearch.setOnClickListener(
+                view -> openWebSearch(binding.appSearch.getQuery().toString()));
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return true; }
             @Override public boolean onQueryTextChange(String newText) {
                 displayApps(AppFilter.filter(visibleApps(), newText));
+                updateWebSearchButton(newText);
                 return true;
             }
         });
@@ -196,6 +201,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         appListAdapter.setIconSizeDp(iconSizeDp);
         favoriteListAdapter.setIconSizeDp(iconSizeDp);
         applyNotificationDots();
+        updateWebSearchButton(binding.appSearch.getQuery().toString());
     }
 
     private void applyNotificationDots() {
@@ -232,6 +238,27 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                     (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             inputMethodManager.showSoftInput(searchInput, 0);
         });
+    }
+
+    private void updateWebSearchButton(String query) {
+        String url = WebSearchProvider.searchUrl(preferences.webSearchProvider(), query);
+        boolean visible = url != null;
+        binding.webSearch.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (visible) {
+            binding.webSearch.setText(getString(R.string.search_web_for, query.trim()));
+        }
+    }
+
+    private void openWebSearch(String query) {
+        String url = WebSearchProvider.searchUrl(preferences.webSearchProvider(), query);
+        if (url == null) {
+            return;
+        }
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException exception) {
+            Toast.makeText(this, R.string.web_search_unavailable, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadApps() {

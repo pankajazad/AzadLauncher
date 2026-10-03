@@ -21,6 +21,7 @@ public class BackupCodecTest {
                 ThemeConfiguration.DARK,
                 IconSizeConfiguration.LARGE,
                 GestureActionConfiguration.OPEN_SETTINGS,
+                WebSearchProvider.DUCKDUCKGO,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -31,6 +32,7 @@ public class BackupCodecTest {
         assertEquals(ThemeConfiguration.DARK, decoded.themeMode());
         assertEquals(IconSizeConfiguration.LARGE, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SETTINGS, decoded.swipeDownAction());
+        assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -46,6 +48,7 @@ public class BackupCodecTest {
                 ThemeConfiguration.FOLLOW_SYSTEM,
                 IconSizeConfiguration.STANDARD,
                 GestureActionConfiguration.OPEN_SEARCH,
+                WebSearchProvider.DISABLED,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -56,6 +59,7 @@ public class BackupCodecTest {
         assertEquals(ThemeConfiguration.FOLLOW_SYSTEM, decoded.themeMode());
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
+        assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
@@ -87,6 +91,7 @@ public class BackupCodecTest {
 
         assertEquals(IconSizeConfiguration.STANDARD, decoded.iconSize());
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
+        assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
     }
 
     @Test
@@ -108,6 +113,17 @@ public class BackupCodecTest {
             fail("Expected invalid swipe action to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("swipe down"));
+        }
+    }
+
+    @Test
+    public void invalidWebSearchProviderIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\nwebSearchProvider=9\n");
+            fail("Expected invalid web provider to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("web search"));
         }
     }
 }

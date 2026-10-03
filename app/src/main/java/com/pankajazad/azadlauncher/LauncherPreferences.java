@@ -20,6 +20,7 @@ final class LauncherPreferences {
     private static final String ICON_SIZE_KEY = "icon_size";
     private static final String NOTIFICATION_DOT_PACKAGES_KEY = "notification_dot_packages";
     private static final String SWIPE_DOWN_ACTION_KEY = "swipe_down_action";
+    private static final String WEB_SEARCH_PROVIDER_KEY = "web_search_provider";
 
     private final SharedPreferences preferences;
 
@@ -117,6 +118,18 @@ final class LauncherPreferences {
         preferences.edit().putInt(SWIPE_DOWN_ACTION_KEY, action).apply();
     }
 
+    int webSearchProvider() {
+        int storedProvider = preferences.getInt(
+                WEB_SEARCH_PROVIDER_KEY, WebSearchProvider.DISABLED);
+        return WebSearchProvider.isValidPreference(storedProvider)
+                ? storedProvider
+                : WebSearchProvider.DISABLED;
+    }
+
+    void setWebSearchProvider(int provider) {
+        preferences.edit().putInt(WEB_SEARCH_PROVIDER_KEY, provider).apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
@@ -124,6 +137,7 @@ final class LauncherPreferences {
                 themeMode(),
                 iconSize(),
                 swipeDownAction(),
+                webSearchProvider(),
                 favoriteAppIds(),
                 hiddenAppIds());
     }
@@ -135,6 +149,7 @@ final class LauncherPreferences {
                 .putInt(THEME_MODE_KEY, backupData.themeMode())
                 .putInt(ICON_SIZE_KEY, backupData.iconSize())
                 .putInt(SWIPE_DOWN_ACTION_KEY, backupData.swipeDownAction())
+                .putInt(WEB_SEARCH_PROVIDER_KEY, backupData.webSearchProvider())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))

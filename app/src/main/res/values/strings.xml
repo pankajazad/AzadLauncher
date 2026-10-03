@@ -18,6 +18,10 @@
     <string name="show_app_labels">Show app labels</string>
     <string name="swipe_down_action">Swipe down action</string>
     <string name="accessibility_open_search">Focus app search</string>
+    <string name="web_search_provider">Web search provider</string>
+    <string name="search_web">Search the web</string>
+    <string name="search_web_for">Search the web for “%1$s”</string>
+    <string name="web_search_unavailable">No web browser is available</string>
     <string name="appearance">Appearance</string>
     <string name="manage_hidden_apps">Manage hidden apps</string>
     <string name="notification_dots">Notification dots</string>
@@ -63,5 +67,11 @@
         <item>Do nothing</item>
         <item>Search apps</item>
         <item>Open settings</item>
+    </string-array>
+
+    <string-array name="web_search_provider_options">
+        <item>Disabled</item>
+        <item>DuckDuckGo</item>
+        <item>Google</item>
     </string-array>
 </resources>

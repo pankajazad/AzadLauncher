@@ -69,6 +69,17 @@
         app:iconifiedByDefault="false"
         app:queryHint="@string/search_apps" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/web_search"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="@string/search_web"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/app_list"
         android:layout_width="match_parent"

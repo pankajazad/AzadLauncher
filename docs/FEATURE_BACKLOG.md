@@ -13,6 +13,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Compact, standard, and large app-icon sizes
 - Notification dots with explicit system permission
 - Configurable swipe-down action and accessible search shortcut
+- Optional DuckDuckGo or Google web-search handoff
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings
 - Unit-test, lint, and debug-APK build gates
@@ -24,5 +25,5 @@ This backlog tracks original, independently designed launcher capabilities.
 - Android widget hosting and placement
 - Compatible icon packs
 - Drawer groups
-- Optional contextual cards and expanded search providers
+- Optional contextual cards
 - Android 16 and Android 17 S24+-sized emulator validation

@@ -12,6 +12,7 @@ final class LauncherBackupData {
     private final int themeMode;
     private final int iconSize;
     private final int swipeDownAction;
+    private final int webSearchProvider;
     private final Set<String> favoriteAppIds;
     private final Set<String> hiddenAppIds;
 
@@ -21,6 +22,7 @@ final class LauncherBackupData {
             int themeMode,
             int iconSize,
             int swipeDownAction,
+            int webSearchProvider,
             Set<String> favoriteAppIds,
             Set<String> hiddenAppIds) {
         this.gridColumns = gridColumns;
@@ -28,6 +30,7 @@ final class LauncherBackupData {
         this.themeMode = themeMode;
         this.iconSize = iconSize;
         this.swipeDownAction = swipeDownAction;
+        this.webSearchProvider = webSearchProvider;
         this.favoriteAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(favoriteAppIds));
         this.hiddenAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(hiddenAppIds));
     }
@@ -37,6 +40,7 @@ final class LauncherBackupData {
     int themeMode() { return themeMode; }
     int iconSize() { return iconSize; }
     int swipeDownAction() { return swipeDownAction; }
+    int webSearchProvider() { return webSearchProvider; }
     Set<String> favoriteAppIds() { return favoriteAppIds; }
     Set<String> hiddenAppIds() { return hiddenAppIds; }
 }

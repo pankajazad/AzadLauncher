@@ -86,6 +86,20 @@
             android:layout_height="48dp"
             android:layout_marginTop="8dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:labelFor="@id/web_search_provider"
+            android:text="@string/web_search_provider"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+
+        <Spinner
+            android:id="@+id/web_search_provider"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/manage_hidden_apps"
             style="@style/Widget.Material3.Button.OutlinedButton"
