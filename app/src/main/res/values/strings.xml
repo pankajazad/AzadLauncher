@@ -6,6 +6,8 @@
     <string name="favorites_empty">Long-press an app below to pin it here.</string>
     <string name="app_pinned">%1$s pinned</string>
     <string name="app_unpinned">%1$s unpinned</string>
+    <string name="reorder_app">Press and hold to reorder app</string>
+    <string name="reorder_named_app">Press and hold to reorder %1$s</string>
     <string name="search_apps">Search apps</string>
     <string name="no_apps_found">No matching apps</string>
     <string name="customize">Customize</string>

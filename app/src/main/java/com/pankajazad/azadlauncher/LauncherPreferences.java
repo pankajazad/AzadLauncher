@@ -5,11 +5,14 @@ import android.content.SharedPreferences;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 final class LauncherPreferences {
     private static final String PREFERENCES_NAME = "launcher_preferences";
     private static final String FAVORITE_APP_IDS_KEY = "favorite_app_ids";
+    private static final String FAVORITE_APP_ORDER_KEY = "favorite_app_order";
     private static final String HIDDEN_APP_IDS_KEY = "hidden_app_ids";
     private static final String GRID_COLUMNS_KEY = "grid_columns";
     private static final String SHOW_LABELS_KEY = "show_app_labels";
@@ -21,11 +24,24 @@ final class LauncherPreferences {
     }
 
     Set<String> favoriteAppIds() {
-        return new HashSet<>(preferences.getStringSet(FAVORITE_APP_IDS_KEY, Collections.emptySet()));
+        LinkedHashSet<String> ordered = new LinkedHashSet<>();
+        if (preferences.contains(FAVORITE_APP_ORDER_KEY)) {
+            String serialized = preferences.getString(FAVORITE_APP_ORDER_KEY, "");
+            if (serialized != null && !serialized.isEmpty()) {
+                Collections.addAll(ordered, serialized.split("\\n"));
+            }
+            return ordered;
+        }
+        ordered.addAll(new TreeSet<>(
+                preferences.getStringSet(FAVORITE_APP_IDS_KEY, Collections.emptySet())));
+        return ordered;
     }
 
     void setFavoriteAppIds(Set<String> appIds) {
-        preferences.edit().putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(appIds)).apply();
+        preferences.edit()
+                .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(appIds))
+                .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(appIds))
+                .apply();
     }
 
     Set<String> hiddenAppIds() {
@@ -65,7 +81,12 @@ final class LauncherPreferences {
                 .putInt(GRID_COLUMNS_KEY, backupData.gridColumns())
                 .putBoolean(SHOW_LABELS_KEY, backupData.showAppLabels())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
+                .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))
                 .apply();
+    }
+
+    private static String serializeFavoriteOrder(Set<String> appIds) {
+        return String.join("\n", appIds);
     }
 }

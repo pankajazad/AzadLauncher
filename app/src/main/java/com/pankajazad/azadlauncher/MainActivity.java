@@ -9,14 +9,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.pankajazad.azadlauncher.databinding.ActivityMainBinding;
 
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +42,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         appListAdapter = new AppListAdapter(this);
-        favoriteListAdapter = new FavoriteListAdapter(this);
+        favoriteListAdapter = new FavoriteListAdapter(this, this::reorderFavorites);
         preferences = new LauncherPreferences(this);
         favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
         hiddenApps = new HiddenApps(preferences.hiddenAppIds());
@@ -46,6 +50,28 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         binding.appList.setAdapter(appListAdapter);
         binding.favoriteList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.favoriteList.setAdapter(favoriteListAdapter);
+        ItemTouchHelper favoriteTouchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, 0) {
+                    @Override
+                    public boolean isLongPressDragEnabled() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onMove(
+                            RecyclerView recyclerView,
+                            RecyclerView.ViewHolder source,
+                            RecyclerView.ViewHolder target) {
+                        return favoriteListAdapter.move(
+                                source.getBindingAdapterPosition(),
+                                target.getBindingAdapterPosition());
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) { }
+                });
+        favoriteTouchHelper.attachToRecyclerView(binding.favoriteList);
+        favoriteListAdapter.setDragStarter(favoriteTouchHelper::startDrag);
         binding.openSettings.setOnClickListener(
                 view -> startActivity(new Intent(this, SettingsActivity.class)));
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -117,9 +143,14 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void displayFavorites() {
-        List<AppEntry> favorites = new ArrayList<>();
+        Map<String, AppEntry> availableApps = new HashMap<>();
         for (AppEntry app : allApps) {
-            if (favoriteApps.contains(app.getId()) && !hiddenApps.contains(app.getId())) {
+            availableApps.put(app.getId(), app);
+        }
+        List<AppEntry> favorites = new ArrayList<>();
+        for (String appId : favoriteApps.snapshot()) {
+            AppEntry app = availableApps.get(appId);
+            if (app != null && !hiddenApps.contains(appId)) {
                 favorites.add(app);
             }
         }
@@ -131,6 +162,12 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
 
     private void saveFavorites() {
         preferences.setFavoriteAppIds(favoriteApps.snapshot());
+    }
+
+    private void reorderFavorites(List<String> orderedAppIds) {
+        if (favoriteApps.reorder(orderedAppIds)) {
+            saveFavorites();
+        }
     }
 
     private void saveHiddenApps() {

@@ -16,7 +16,7 @@ final class BackupCodec {
         backup.append("version=").append(LauncherBackupData.CURRENT_VERSION).append('\n');
         backup.append("gridColumns=").append(data.gridColumns()).append('\n');
         backup.append("showAppLabels=").append(data.showAppLabels()).append('\n');
-        for (String appId : new TreeSet<>(data.favoriteAppIds())) {
+        for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
         for (String appId : new TreeSet<>(data.hiddenAppIds())) {

@@ -21,4 +21,13 @@
         android:gravity="center"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Material3.LabelMedium" />
+
+    <ImageButton
+        android:id="@+id/drag_handle"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/reorder_app"
+        android:padding="6dp"
+        android:src="@drawable/ic_drag_handle" />
 </LinearLayout>

@@ -7,6 +7,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Android Home intent and launchable-app discovery
 - Responsive searchable app grid
 - Persistent favorites with long-press pin and unpin
+- Drag-and-drop favorite ordering with persistent positions
 - Configurable app-grid columns and app-label visibility
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings

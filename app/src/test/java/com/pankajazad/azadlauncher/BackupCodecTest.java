@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 
@@ -25,6 +26,9 @@ public class BackupCodecTest {
         assertEquals(5, decoded.gridColumns());
         assertFalse(decoded.showAppLabels());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
+        assertEquals(
+                new ArrayList<>(source.favoriteAppIds()),
+                new ArrayList<>(decoded.favoriteAppIds()));
         assertEquals(source.hiddenAppIds(), decoded.hiddenAppIds());
     }
 
