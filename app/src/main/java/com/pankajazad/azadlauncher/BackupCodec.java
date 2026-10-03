@@ -16,6 +16,7 @@ final class BackupCodec {
         backup.append("version=").append(LauncherBackupData.CURRENT_VERSION).append('\n');
         backup.append("gridColumns=").append(data.gridColumns()).append('\n');
         backup.append("showAppLabels=").append(data.showAppLabels()).append('\n');
+        backup.append("themeMode=").append(data.themeMode()).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
@@ -32,6 +33,7 @@ final class BackupCodec {
         Integer version = null;
         Integer gridColumns = null;
         Boolean showAppLabels = null;
+        int themeMode = ThemeConfiguration.FOLLOW_SYSTEM;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
@@ -57,6 +59,9 @@ final class BackupCodec {
                     }
                     showAppLabels = Boolean.parseBoolean(value);
                     break;
+                case "themeMode":
+                    themeMode = parseInteger(value, "theme mode");
+                    break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
                     break;
@@ -77,7 +82,10 @@ final class BackupCodec {
         if (showAppLabels == null) {
             throw new IllegalArgumentException("Missing label preference");
         }
-        return new LauncherBackupData(gridColumns, showAppLabels, favorites, hidden);
+        if (!ThemeConfiguration.isValidPreference(themeMode)) {
+            throw new IllegalArgumentException("Invalid theme preference");
+        }
+        return new LauncherBackupData(gridColumns, showAppLabels, themeMode, favorites, hidden);
     }
 
     private static int parseInteger(String value, String field) {

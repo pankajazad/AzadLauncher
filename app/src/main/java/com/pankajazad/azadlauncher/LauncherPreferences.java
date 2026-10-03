@@ -16,6 +16,7 @@ final class LauncherPreferences {
     private static final String HIDDEN_APP_IDS_KEY = "hidden_app_ids";
     private static final String GRID_COLUMNS_KEY = "grid_columns";
     private static final String SHOW_LABELS_KEY = "show_app_labels";
+    private static final String THEME_MODE_KEY = "theme_mode";
 
     private final SharedPreferences preferences;
 
@@ -68,10 +69,22 @@ final class LauncherPreferences {
         preferences.edit().putBoolean(SHOW_LABELS_KEY, showLabels).apply();
     }
 
+    int themeMode() {
+        int storedMode = preferences.getInt(THEME_MODE_KEY, ThemeConfiguration.FOLLOW_SYSTEM);
+        return ThemeConfiguration.isValidPreference(storedMode)
+                ? storedMode
+                : ThemeConfiguration.FOLLOW_SYSTEM;
+    }
+
+    void setThemeMode(int themeMode) {
+        preferences.edit().putInt(THEME_MODE_KEY, themeMode).apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
                 showAppLabels(),
+                themeMode(),
                 favoriteAppIds(),
                 hiddenAppIds());
     }
@@ -80,6 +93,7 @@ final class LauncherPreferences {
         preferences.edit()
                 .putInt(GRID_COLUMNS_KEY, backupData.gridColumns())
                 .putBoolean(SHOW_LABELS_KEY, backupData.showAppLabels())
+                .putInt(THEME_MODE_KEY, backupData.themeMode())
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))

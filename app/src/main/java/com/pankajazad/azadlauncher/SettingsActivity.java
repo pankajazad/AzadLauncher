@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.pankajazad.azadlauncher.databinding.ActivitySettingsBinding;
 
@@ -58,6 +59,28 @@ public final class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+        ArrayAdapter<CharSequence> themeAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.theme_options,
+                android.R.layout.simple_spinner_item);
+        themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.themeMode.setAdapter(themeAdapter);
+        binding.themeMode.setSelection(ThemeConfiguration.spinnerIndex(preferences.themeMode()));
+        binding.themeMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int themeMode = ThemeConfiguration.preferenceForSpinnerIndex(position);
+                preferences.setThemeMode(themeMode);
+                int nightMode = ThemeConfiguration.appCompatNightMode(themeMode);
+                if (AppCompatDelegate.getDefaultNightMode() != nightMode) {
+                    AppCompatDelegate.setDefaultNightMode(nightMode);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         binding.showLabels.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
         binding.manageHiddenApps.setOnClickListener(
@@ -73,6 +96,7 @@ public final class SettingsActivity extends AppCompatActivity {
     private void refreshControls() {
         binding.gridColumns.setSelection(GridConfiguration.spinnerIndex(preferences.gridColumns()));
         binding.showLabels.setChecked(preferences.showAppLabels());
+        binding.themeMode.setSelection(ThemeConfiguration.spinnerIndex(preferences.themeMode()));
     }
 
     private void writeBackup(Uri uri) {

@@ -1,6 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Theme.AzadLauncher" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/launcher_background</item>
         <item name="colorPrimary">#315DA8</item>
         <item name="colorSecondary">#4E658A</item>

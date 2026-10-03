@@ -18,6 +18,7 @@ public class BackupCodecTest {
         LauncherBackupData source = new LauncherBackupData(
                 5,
                 false,
+                ThemeConfiguration.DARK,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"));
 
@@ -25,6 +26,7 @@ public class BackupCodecTest {
 
         assertEquals(5, decoded.gridColumns());
         assertFalse(decoded.showAppLabels());
+        assertEquals(ThemeConfiguration.DARK, decoded.themeMode());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -37,6 +39,7 @@ public class BackupCodecTest {
         LauncherBackupData source = new LauncherBackupData(
                 GridConfiguration.AUTOMATIC,
                 true,
+                ThemeConfiguration.FOLLOW_SYSTEM,
                 Collections.emptySet(),
                 Collections.emptySet());
 
@@ -44,6 +47,7 @@ public class BackupCodecTest {
 
         assertEquals(GridConfiguration.AUTOMATIC, decoded.gridColumns());
         assertTrue(decoded.showAppLabels());
+        assertEquals(ThemeConfiguration.FOLLOW_SYSTEM, decoded.themeMode());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
     }
