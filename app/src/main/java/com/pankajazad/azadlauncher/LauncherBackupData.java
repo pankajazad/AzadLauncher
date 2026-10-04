@@ -15,6 +15,7 @@ final class LauncherBackupData {
     private final int webSearchProvider;
     private final boolean showContextCard;
     private final int drawerGroup;
+    private final int drawerSort;
     private final Set<String> favoriteAppIds;
     private final Set<String> hiddenAppIds;
     private final String quickFolderName;
@@ -29,6 +30,7 @@ final class LauncherBackupData {
             int webSearchProvider,
             boolean showContextCard,
             int drawerGroup,
+            int drawerSort,
             Set<String> favoriteAppIds,
             Set<String> hiddenAppIds,
             String quickFolderName,
@@ -41,6 +43,7 @@ final class LauncherBackupData {
         this.webSearchProvider = webSearchProvider;
         this.showContextCard = showContextCard;
         this.drawerGroup = drawerGroup;
+        this.drawerSort = drawerSort;
         this.favoriteAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(favoriteAppIds));
         this.hiddenAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(hiddenAppIds));
         this.quickFolderName = quickFolderName;
@@ -56,6 +59,7 @@ final class LauncherBackupData {
     int webSearchProvider() { return webSearchProvider; }
     boolean showContextCard() { return showContextCard; }
     int drawerGroup() { return drawerGroup; }
+    int drawerSort() { return drawerSort; }
     Set<String> favoriteAppIds() { return favoriteAppIds; }
     Set<String> hiddenAppIds() { return hiddenAppIds; }
     String quickFolderName() { return quickFolderName; }

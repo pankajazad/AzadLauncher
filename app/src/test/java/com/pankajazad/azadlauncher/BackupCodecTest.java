@@ -24,6 +24,7 @@ public class BackupCodecTest {
                 WebSearchProvider.DUCKDUCKGO,
                 false,
                 DrawerGroupConfiguration.PRODUCTIVITY,
+                DrawerSortConfiguration.CATEGORY_THEN_NAME,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"),
                 "Travel & tools",
@@ -39,6 +40,7 @@ public class BackupCodecTest {
         assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
         assertFalse(decoded.showContextCard());
         assertEquals(DrawerGroupConfiguration.PRODUCTIVITY, decoded.drawerGroup());
+        assertEquals(DrawerSortConfiguration.CATEGORY_THEN_NAME, decoded.drawerSort());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
@@ -59,6 +61,7 @@ public class BackupCodecTest {
                 WebSearchProvider.DISABLED,
                 true,
                 DrawerGroupConfiguration.ALL,
+                DrawerSortConfiguration.ALPHABETICAL,
                 Collections.emptySet(),
                 Collections.emptySet(),
                 QuickFolder.DEFAULT_NAME,
@@ -74,6 +77,7 @@ public class BackupCodecTest {
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
+        assertEquals(DrawerSortConfiguration.ALPHABETICAL, decoded.drawerSort());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
         assertEquals(QuickFolder.DEFAULT_NAME, decoded.quickFolderName());
@@ -110,6 +114,7 @@ public class BackupCodecTest {
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
+        assertEquals(DrawerSortConfiguration.ALPHABETICAL, decoded.drawerSort());
         assertEquals(QuickFolder.DEFAULT_NAME, decoded.quickFolderName());
     }
 
@@ -165,6 +170,17 @@ public class BackupCodecTest {
             fail("Expected invalid drawer group to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("drawer group"));
+        }
+    }
+
+    @Test
+    public void invalidDrawerSortIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\ndrawerSort=9\n");
+            fail("Expected invalid drawer sort to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("drawer sort"));
         }
     }
 

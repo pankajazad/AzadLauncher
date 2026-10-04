@@ -22,6 +22,7 @@ final class BackupCodec {
         backup.append("webSearchProvider=").append(data.webSearchProvider()).append('\n');
         backup.append("showContextCard=").append(data.showContextCard()).append('\n');
         backup.append("drawerGroup=").append(data.drawerGroup()).append('\n');
+        backup.append("drawerSort=").append(data.drawerSort()).append('\n');
         backup.append("quickFolderName=").append(encodeAppId(data.quickFolderName())).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
@@ -48,6 +49,7 @@ final class BackupCodec {
         int webSearchProvider = WebSearchProvider.DISABLED;
         boolean showContextCard = true;
         int drawerGroup = DrawerGroupConfiguration.ALL;
+        int drawerSort = DrawerSortConfiguration.ALPHABETICAL;
         String quickFolderName = QuickFolder.DEFAULT_NAME;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
@@ -96,6 +98,9 @@ final class BackupCodec {
                 case "drawerGroup":
                     drawerGroup = parseInteger(value, "drawer group");
                     break;
+                case "drawerSort":
+                    drawerSort = parseInteger(value, "drawer sort");
+                    break;
                 case "quickFolderName":
                     quickFolderName = decodeAppId(value);
                     break;
@@ -137,6 +142,9 @@ final class BackupCodec {
         if (!DrawerGroupConfiguration.isValidPreference(drawerGroup)) {
             throw new IllegalArgumentException("Invalid drawer group");
         }
+        if (!DrawerSortConfiguration.isValidPreference(drawerSort)) {
+            throw new IllegalArgumentException("Invalid drawer sort");
+        }
         if (!QuickFolder.isValidName(quickFolderName)) {
             throw new IllegalArgumentException("Invalid quick folder name");
         }
@@ -149,6 +157,7 @@ final class BackupCodec {
                 webSearchProvider,
                 showContextCard,
                 drawerGroup,
+                drawerSort,
                 favorites,
                 hidden,
                 quickFolderName,

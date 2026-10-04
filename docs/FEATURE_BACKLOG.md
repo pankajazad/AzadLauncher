@@ -16,6 +16,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Optional DuckDuckGo or Google web-search handoff
 - Optional localized date and battery context card
 - Persistent category-based drawer groups
+- Persistent alphabetical, reverse, and category-based drawer sorting
 - Renameable Quick Folder with searchable membership management
 - Long-press app shortcuts for favorites, folders, hiding, app info, and uninstall
 - Searchable hidden-app management

@@ -142,6 +142,25 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+        ArrayAdapter<CharSequence> drawerSortAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.drawer_sort_options,
+                android.R.layout.simple_spinner_item);
+        drawerSortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.drawerSort.setAdapter(drawerSortAdapter);
+        binding.drawerSort.setSelection(
+                DrawerSortConfiguration.spinnerIndex(preferences.drawerSort()));
+        binding.drawerSort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferences.setDrawerSort(
+                        DrawerSortConfiguration.preferenceForSpinnerIndex(position));
+                refreshAppResults();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
         binding.appSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return true; }
             @Override public boolean onQueryTextChange(String newText) {
@@ -365,10 +384,11 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void refreshAppResults() {
-        displayApps(AppFilter.filter(
+        List<AppEntry> filteredApps = AppFilter.filter(
                 visibleApps(),
                 binding.appSearch.getQuery().toString(),
-                preferences.drawerGroup()));
+                preferences.drawerGroup());
+        displayApps(DrawerSortConfiguration.sort(filteredApps, preferences.drawerSort()));
     }
 
     private void removeUnavailableSavedApps() {

@@ -23,6 +23,7 @@ final class LauncherPreferences {
     private static final String WEB_SEARCH_PROVIDER_KEY = "web_search_provider";
     private static final String SHOW_CONTEXT_CARD_KEY = "show_context_card";
     private static final String DRAWER_GROUP_KEY = "drawer_group";
+    private static final String DRAWER_SORT_KEY = "drawer_sort";
     private static final String QUICK_FOLDER_NAME_KEY = "quick_folder_name";
     private static final String QUICK_FOLDER_APP_IDS_KEY = "quick_folder_app_ids";
 
@@ -153,6 +154,18 @@ final class LauncherPreferences {
         preferences.edit().putInt(DRAWER_GROUP_KEY, drawerGroup).apply();
     }
 
+    int drawerSort() {
+        int storedSort = preferences.getInt(
+                DRAWER_SORT_KEY, DrawerSortConfiguration.ALPHABETICAL);
+        return DrawerSortConfiguration.isValidPreference(storedSort)
+                ? storedSort
+                : DrawerSortConfiguration.ALPHABETICAL;
+    }
+
+    void setDrawerSort(int drawerSort) {
+        preferences.edit().putInt(DRAWER_SORT_KEY, drawerSort).apply();
+    }
+
     String quickFolderName() {
         return QuickFolder.normalizeName(preferences.getString(
                 QUICK_FOLDER_NAME_KEY, QuickFolder.DEFAULT_NAME));
@@ -185,6 +198,7 @@ final class LauncherPreferences {
                 webSearchProvider(),
                 showContextCard(),
                 drawerGroup(),
+                drawerSort(),
                 favoriteAppIds(),
                 hiddenAppIds(),
                 quickFolderName(),
@@ -201,6 +215,7 @@ final class LauncherPreferences {
                 .putInt(WEB_SEARCH_PROVIDER_KEY, backupData.webSearchProvider())
                 .putBoolean(SHOW_CONTEXT_CARD_KEY, backupData.showContextCard())
                 .putInt(DRAWER_GROUP_KEY, backupData.drawerGroup())
+                .putInt(DRAWER_SORT_KEY, backupData.drawerSort())
                 .putString(QUICK_FOLDER_NAME_KEY, backupData.quickFolderName())
                 .putStringSet(
                         QUICK_FOLDER_APP_IDS_KEY,
