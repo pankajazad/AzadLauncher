@@ -24,6 +24,7 @@ final class LauncherPreferences {
     private static final String SWIPE_DOWN_ACTION_KEY = "swipe_down_action";
     private static final String WEB_SEARCH_PROVIDER_KEY = "web_search_provider";
     private static final String SHOW_CONTEXT_CARD_KEY = "show_context_card";
+    private static final String ALLOW_HOME_ROTATION_KEY = "allow_home_rotation";
     private static final String DRAWER_GROUP_KEY = "drawer_group";
     private static final String DRAWER_SORT_KEY = "drawer_sort";
     private static final String RECENT_APP_ORDER_KEY = "recent_app_order";
@@ -146,6 +147,14 @@ final class LauncherPreferences {
         preferences.edit().putBoolean(SHOW_CONTEXT_CARD_KEY, showContextCard).apply();
     }
 
+    boolean allowHomeRotation() {
+        return preferences.getBoolean(ALLOW_HOME_ROTATION_KEY, false);
+    }
+
+    void setAllowHomeRotation(boolean allowHomeRotation) {
+        preferences.edit().putBoolean(ALLOW_HOME_ROTATION_KEY, allowHomeRotation).apply();
+    }
+
     int drawerGroup() {
         int storedGroup = preferences.getInt(DRAWER_GROUP_KEY, DrawerGroupConfiguration.ALL);
         return DrawerGroupConfiguration.isValidPreference(storedGroup)
@@ -213,6 +222,7 @@ final class LauncherPreferences {
                 swipeDownAction(),
                 webSearchProvider(),
                 showContextCard(),
+                allowHomeRotation(),
                 drawerGroup(),
                 drawerSort(),
                 favoriteAppIds(),
@@ -230,6 +240,7 @@ final class LauncherPreferences {
                 .putInt(SWIPE_DOWN_ACTION_KEY, backupData.swipeDownAction())
                 .putInt(WEB_SEARCH_PROVIDER_KEY, backupData.webSearchProvider())
                 .putBoolean(SHOW_CONTEXT_CARD_KEY, backupData.showContextCard())
+                .putBoolean(ALLOW_HOME_ROTATION_KEY, backupData.allowHomeRotation())
                 .putInt(DRAWER_GROUP_KEY, backupData.drawerGroup())
                 .putInt(DRAWER_SORT_KEY, backupData.drawerSort())
                 .putString(QUICK_FOLDER_NAME_KEY, backupData.quickFolderName())

@@ -23,6 +23,7 @@ public class BackupCodecTest {
                 GestureActionConfiguration.OPEN_SETTINGS,
                 WebSearchProvider.DUCKDUCKGO,
                 false,
+                true,
                 DrawerGroupConfiguration.PRODUCTIVITY,
                 DrawerSortConfiguration.RECENTLY_USED,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
@@ -39,6 +40,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SETTINGS, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
         assertFalse(decoded.showContextCard());
+        assertTrue(decoded.allowHomeRotation());
         assertEquals(DrawerGroupConfiguration.PRODUCTIVITY, decoded.drawerGroup());
         assertEquals(DrawerSortConfiguration.RECENTLY_USED, decoded.drawerSort());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
@@ -60,6 +62,7 @@ public class BackupCodecTest {
                 GestureActionConfiguration.OPEN_SEARCH,
                 WebSearchProvider.DISABLED,
                 true,
+                false,
                 DrawerGroupConfiguration.ALL,
                 DrawerSortConfiguration.ALPHABETICAL,
                 Collections.emptySet(),
@@ -76,6 +79,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
+        assertFalse(decoded.allowHomeRotation());
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
         assertEquals(DrawerSortConfiguration.ALPHABETICAL, decoded.drawerSort());
         assertTrue(decoded.favoriteAppIds().isEmpty());
@@ -113,6 +117,7 @@ public class BackupCodecTest {
         assertEquals(GestureActionConfiguration.OPEN_SEARCH, decoded.swipeDownAction());
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
+        assertFalse(decoded.allowHomeRotation());
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
         assertEquals(DrawerSortConfiguration.ALPHABETICAL, decoded.drawerSort());
         assertEquals(QuickFolder.DEFAULT_NAME, decoded.quickFolderName());
@@ -159,6 +164,17 @@ public class BackupCodecTest {
             fail("Expected invalid context card preference to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("context card"));
+        }
+    }
+
+    @Test
+    public void invalidHomeRotationPreferenceIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\nallowHomeRotation=yes\n");
+            fail("Expected invalid home rotation preference to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("home rotation"));
         }
     }
 

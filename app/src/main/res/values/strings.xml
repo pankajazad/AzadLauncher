@@ -30,6 +30,7 @@
     <string name="icon_size">Icon size</string>
     <string name="show_app_labels">Show app labels</string>
     <string name="show_context_card">Show date and battery card</string>
+    <string name="allow_home_rotation">Allow home screen rotation</string>
     <string name="context_card_description">%1$s. %2$s. Open calendar</string>
     <string name="battery_charging">%1$d%% battery · Charging</string>
     <string name="battery_remaining">%1$d%% battery</string>

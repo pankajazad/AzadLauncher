@@ -11,6 +11,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Configurable app-grid columns and app-label visibility
 - System, light, and dark appearance modes
 - Compact, standard, and large app-icon sizes
+- Optional sensor-based home-screen rotation
 - Notification dots with explicit system permission
 - Configurable swipe-down action and accessible search shortcut
 - Optional DuckDuckGo or Google web-search handoff

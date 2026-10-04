@@ -137,6 +137,8 @@ public final class SettingsActivity extends AppCompatActivity {
                 (buttonView, isChecked) -> preferences.setShowAppLabels(isChecked));
         binding.showContextCard.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> preferences.setShowContextCard(isChecked));
+        binding.allowHomeRotation.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> preferences.setAllowHomeRotation(isChecked));
         binding.manageHiddenApps.setOnClickListener(
                 view -> startActivity(new Intent(this, HiddenAppsActivity.class)));
         binding.manageQuickFolder.setOnClickListener(
@@ -155,6 +157,7 @@ public final class SettingsActivity extends AppCompatActivity {
         binding.gridColumns.setSelection(GridConfiguration.spinnerIndex(preferences.gridColumns()));
         binding.showLabels.setChecked(preferences.showAppLabels());
         binding.showContextCard.setChecked(preferences.showContextCard());
+        binding.allowHomeRotation.setChecked(preferences.allowHomeRotation());
         binding.themeMode.setSelection(ThemeConfiguration.spinnerIndex(preferences.themeMode()));
         binding.iconSize.setSelection(IconSizeConfiguration.spinnerIndex(preferences.iconSize()));
         binding.swipeDownAction.setSelection(

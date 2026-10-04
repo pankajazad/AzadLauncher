@@ -258,6 +258,11 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void applyDisplayPreferences() {
+        int requestedOrientation = HomeRotationConfiguration.requestedOrientation(
+                preferences.allowHomeRotation());
+        if (getRequestedOrientation() != requestedOrientation) {
+            setRequestedOrientation(requestedOrientation);
+        }
         int columns = GridConfiguration.resolveColumns(
                 preferences.gridColumns(),
                 getResources().getConfiguration().screenWidthDp);

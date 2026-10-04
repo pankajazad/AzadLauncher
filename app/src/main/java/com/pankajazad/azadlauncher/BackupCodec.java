@@ -21,6 +21,7 @@ final class BackupCodec {
         backup.append("swipeDownAction=").append(data.swipeDownAction()).append('\n');
         backup.append("webSearchProvider=").append(data.webSearchProvider()).append('\n');
         backup.append("showContextCard=").append(data.showContextCard()).append('\n');
+        backup.append("allowHomeRotation=").append(data.allowHomeRotation()).append('\n');
         backup.append("drawerGroup=").append(data.drawerGroup()).append('\n');
         backup.append("drawerSort=").append(data.drawerSort()).append('\n');
         backup.append("quickFolderName=").append(encodeAppId(data.quickFolderName())).append('\n');
@@ -48,6 +49,7 @@ final class BackupCodec {
         int swipeDownAction = GestureActionConfiguration.OPEN_SEARCH;
         int webSearchProvider = WebSearchProvider.DISABLED;
         boolean showContextCard = true;
+        boolean allowHomeRotation = false;
         int drawerGroup = DrawerGroupConfiguration.ALL;
         int drawerSort = DrawerSortConfiguration.ALPHABETICAL;
         String quickFolderName = QuickFolder.DEFAULT_NAME;
@@ -94,6 +96,12 @@ final class BackupCodec {
                         throw new IllegalArgumentException("Invalid context card preference");
                     }
                     showContextCard = Boolean.parseBoolean(value);
+                    break;
+                case "allowHomeRotation":
+                    if (!"true".equals(value) && !"false".equals(value)) {
+                        throw new IllegalArgumentException("Invalid home rotation preference");
+                    }
+                    allowHomeRotation = Boolean.parseBoolean(value);
                     break;
                 case "drawerGroup":
                     drawerGroup = parseInteger(value, "drawer group");
@@ -156,6 +164,7 @@ final class BackupCodec {
                 swipeDownAction,
                 webSearchProvider,
                 showContextCard,
+                allowHomeRotation,
                 drawerGroup,
                 drawerSort,
                 favorites,
