@@ -2,7 +2,10 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "main"
+      - "chatgpt-*"
+      - "chatgpt/**"
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
@@ -10,7 +13,7 @@ on:
     - cron: "17 21 * * 0"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: android-ci-${{ github.ref }}
@@ -66,9 +69,11 @@ jobs:
           retention-days: 14
 
   publish:
-    name: Publish latest APK
+    name: Publish branch APK
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/chatgpt-') || startsWith(github.ref, 'refs/heads/chatgpt/'))
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -82,16 +87,43 @@ jobs:
           name: AzadLauncher-debug-${{ github.sha }}
           path: release
 
-      - name: Publish/update latest release
+      - name: Publish branch APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           APK="release/app/build/outputs/apk/debug/app-debug.apk"
           SHA="release/app-debug.apk.sha256"
 
-          if gh release view latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload latest "$APK" "$SHA"               --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit latest --repo "$GITHUB_REPOSITORY"               --target "$GITHUB_SHA"               --title "Latest debug APK"               --notes "Automatically built from commit $GITHUB_SHA."               --prerelease=false               --latest=true
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            TAG="latest"
+            TITLE="Latest debug APK"
+            PRERELEASE="false"
+            LATEST="--latest"
           else
-            gh release create latest "$APK" "$SHA"               --repo "$GITHUB_REPOSITORY"               --target "$GITHUB_SHA"               --title "Latest debug APK"               --notes "Automatically built from commit $GITHUB_SHA."               --latest
+            SAFE_BRANCH="$(printf '%s' "$GITHUB_REF_NAME" | tr '/' '-')"
+            TAG="apk-${SAFE_BRANCH}"
+            TITLE="Development APK — ${GITHUB_REF_NAME}"
+            PRERELEASE="true"
+            LATEST="--latest=false"
           fi
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$SHA" --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \\
+              --target "$GITHUB_SHA" \\
+              --title "$TITLE" \\
+              --notes "Automatically built from commit $GITHUB_SHA on branch $GITHUB_REF_NAME." \\
+              --prerelease="$PRERELEASE" \\
+              $LATEST
+          else
+            gh release create "$TAG" "$APK" "$SHA" \\
+              --repo "$GITHUB_REPOSITORY" \\
+              --target "$GITHUB_SHA" \\
+              --title "$TITLE" \\
+              --notes "Automatically built from commit $GITHUB_SHA on branch $GITHUB_REF_NAME." \\
+              --prerelease="$PRERELEASE" \\
+              $LATEST
+          fi
+
+          echo "APK_URL=https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/app-debug.apk" >> "$GITHUB_STEP_SUMMARY"
+          echo "SHA256_URL=https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/app-debug.apk.sha256" >> "$GITHUB_STEP_SUMMARY"
