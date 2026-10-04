@@ -1,26 +1,30 @@
-name: Build and publish latest APK
+name: Android CI
 
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
+  schedule:
+    - cron: "17 21 * * 0"
 
 permissions:
   contents: write
 
 concurrency:
-  group: latest-apk
+  group: android-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  verify:
+    name: Build, test and lint
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
+
     steps:
-      - name: Checkout main commit
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -29,39 +33,67 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Install Android SDK packages
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required Android SDK packages
         run: |
-          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Run unit tests
+        run: ./gradlew test --no-daemon --stacktrace
+
+      - name: Run lint
+        run: ./gradlew lint --no-daemon --stacktrace
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Calculate APK SHA-256
+        if: success()
+        run: sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app-debug.apk.sha256
+
+      - name: Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AzadLauncher-debug-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app-debug.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish latest APK
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download verified APK
+        uses: actions/download-artifact@v4
+        with:
+          name: AzadLauncher-debug-${{ github.sha }}
+          path: release
 
       - name: Publish/update latest release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload latest app/build/outputs/apk/debug/app-debug.apk \
-              --repo "$GITHUB_REPOSITORY" --clobber
-            gh release edit latest --repo "$GITHUB_REPOSITORY" \
-              --target "$GITHUB_SHA" \
-              --title "Latest debug APK" \
-              --notes "Debug APK built from commit $GITHUB_SHA."
-          else
-            gh release create latest app/build/outputs/apk/debug/app-debug.apk \
-              --repo "$GITHUB_REPOSITORY" \
-              --target "$GITHUB_SHA" \
-              --title "Latest debug APK" \
-              --prerelease \
-              --notes "Debug APK built from commit $GITHUB_SHA."
-          fi
+          APK="release/app/build/outputs/apk/debug/app-debug.apk"
+          SHA="release/app-debug.apk.sha256"
 
-      - name: Upload APK as workflow artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AzadLauncher-debug-${{ github.sha }}
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 14
+          if gh release view latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload latest "$APK" "$SHA"               --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit latest --repo "$GITHUB_REPOSITORY"               --target "$GITHUB_SHA"               --title "Latest debug APK"               --notes "Automatically built from commit $GITHUB_SHA."               --prerelease=false               --latest=true
+          else
+            gh release create latest "$APK" "$SHA"               --repo "$GITHUB_REPOSITORY"               --target "$GITHUB_SHA"               --title "Latest debug APK"               --notes "Automatically built from commit $GITHUB_SHA."               --latest
+          fi
