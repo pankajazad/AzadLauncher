@@ -17,6 +17,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Optional localized date and battery context card
 - Persistent category-based drawer groups
 - Persistent alphabetical, reverse, and category-based drawer sorting
+- Local recent-app history and recently-used drawer sorting
 - Renameable Quick Folder with searchable membership management
 - Long-press app shortcuts for favorites, folders, hiding, app info, and uninstall
 - Searchable hidden-app management

@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,6 +26,7 @@ final class LauncherPreferences {
     private static final String SHOW_CONTEXT_CARD_KEY = "show_context_card";
     private static final String DRAWER_GROUP_KEY = "drawer_group";
     private static final String DRAWER_SORT_KEY = "drawer_sort";
+    private static final String RECENT_APP_ORDER_KEY = "recent_app_order";
     private static final String QUICK_FOLDER_NAME_KEY = "quick_folder_name";
     private static final String QUICK_FOLDER_APP_IDS_KEY = "quick_folder_app_ids";
 
@@ -164,6 +167,19 @@ final class LauncherPreferences {
 
     void setDrawerSort(int drawerSort) {
         preferences.edit().putInt(DRAWER_SORT_KEY, drawerSort).apply();
+    }
+
+    List<String> recentAppIds() {
+        List<String> appIds = new ArrayList<>();
+        String serialized = preferences.getString(RECENT_APP_ORDER_KEY, "");
+        if (serialized != null && !serialized.isEmpty()) {
+            Collections.addAll(appIds, serialized.split("\\n"));
+        }
+        return appIds;
+    }
+
+    void setRecentAppIds(List<String> appIds) {
+        preferences.edit().putString(RECENT_APP_ORDER_KEY, String.join("\n", appIds)).apply();
     }
 
     String quickFolderName() {

@@ -50,6 +50,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private FavoriteListAdapter favoriteListAdapter;
     private FavoriteApps favoriteApps;
     private HiddenApps hiddenApps;
+    private RecentApps recentApps;
     private QuickFolder quickFolder;
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
@@ -83,6 +84,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         preferences = new LauncherPreferences(this);
         favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
         hiddenApps = new HiddenApps(preferences.hiddenAppIds());
+        recentApps = new RecentApps(preferences.recentAppIds());
         quickFolder = new QuickFolder(preferences.quickFolderAppIds());
         ViewCompat.addAccessibilityAction(
                 binding.getRoot(),
@@ -388,7 +390,8 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 visibleApps(),
                 binding.appSearch.getQuery().toString(),
                 preferences.drawerGroup());
-        displayApps(DrawerSortConfiguration.sort(filteredApps, preferences.drawerSort()));
+        displayApps(DrawerSortConfiguration.sort(
+                filteredApps, preferences.drawerSort(), recentApps.snapshot()));
     }
 
     private void removeUnavailableSavedApps() {
@@ -404,6 +407,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         }
         if (quickFolder.retainAvailable(availableAppIds)) {
             preferences.setQuickFolderAppIds(quickFolder.snapshot());
+        }
+        if (recentApps.retainAvailable(availableAppIds)) {
+            preferences.setRecentAppIds(recentApps.snapshot());
         }
     }
 
@@ -502,6 +508,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     @Override
     public void onOpenApp(AppEntry app) {
         startActivity(app.getLaunchIntent());
+        if (recentApps.record(app.getId())) {
+            preferences.setRecentAppIds(recentApps.snapshot());
+        }
     }
 
     @Override

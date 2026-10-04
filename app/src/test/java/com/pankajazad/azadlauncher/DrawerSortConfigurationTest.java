@@ -41,6 +41,21 @@ public class DrawerSortConfigurationTest {
     }
 
     @Test
+    public void recentSortPutsHistoryFirstAndSortsUnusedAppsByName() {
+        List<AppEntry> apps = Arrays.asList(
+                app("Zulu", DrawerGroupConfiguration.GAMES),
+                app("Alpha", DrawerGroupConfiguration.SOCIAL),
+                app("Lima", DrawerGroupConfiguration.PRODUCTIVITY));
+
+        assertEquals(
+                Arrays.asList("Lima", "Zulu", "Alpha"),
+                labels(DrawerSortConfiguration.sort(
+                        apps,
+                        DrawerSortConfiguration.RECENTLY_USED,
+                        Arrays.asList("Lima", "Zulu"))));
+    }
+
+    @Test
     public void invalidPreferenceFallsBackToAlphabetical() {
         assertFalse(DrawerSortConfiguration.isValidPreference(9));
         assertEquals(

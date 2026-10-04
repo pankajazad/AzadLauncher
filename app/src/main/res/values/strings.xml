@@ -113,5 +113,6 @@
         <item>Alphabetical</item>
         <item>Reverse alphabetical</item>
         <item>Category, then name</item>
+        <item>Recently used</item>
     </string-array>
 </resources>

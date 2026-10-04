@@ -24,7 +24,7 @@ public class BackupCodecTest {
                 WebSearchProvider.DUCKDUCKGO,
                 false,
                 DrawerGroupConfiguration.PRODUCTIVITY,
-                DrawerSortConfiguration.CATEGORY_THEN_NAME,
+                DrawerSortConfiguration.RECENTLY_USED,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 Collections.singleton("hidden/Activity"),
                 "Travel & tools",
@@ -40,7 +40,7 @@ public class BackupCodecTest {
         assertEquals(WebSearchProvider.DUCKDUCKGO, decoded.webSearchProvider());
         assertFalse(decoded.showContextCard());
         assertEquals(DrawerGroupConfiguration.PRODUCTIVITY, decoded.drawerGroup());
-        assertEquals(DrawerSortConfiguration.CATEGORY_THEN_NAME, decoded.drawerSort());
+        assertEquals(DrawerSortConfiguration.RECENTLY_USED, decoded.drawerSort());
         assertEquals(source.favoriteAppIds(), decoded.favoriteAppIds());
         assertEquals(
                 new ArrayList<>(source.favoriteAppIds()),
