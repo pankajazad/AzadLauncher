@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -48,6 +49,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private FavoriteListAdapter favoriteListAdapter;
     private FavoriteApps favoriteApps;
     private HiddenApps hiddenApps;
+    private QuickFolder quickFolder;
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
@@ -80,6 +82,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         preferences = new LauncherPreferences(this);
         favoriteApps = new FavoriteApps(preferences.favoriteAppIds());
         hiddenApps = new HiddenApps(preferences.hiddenAppIds());
+        quickFolder = new QuickFolder(preferences.quickFolderAppIds());
         ViewCompat.addAccessibilityAction(
                 binding.getRoot(),
                 getString(R.string.accessibility_open_search),
@@ -116,6 +119,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         binding.openSettings.setOnClickListener(
                 view -> startActivity(new Intent(this, SettingsActivity.class)));
         binding.contextCard.setOnClickListener(view -> openCalendar());
+        binding.quickFolder.setOnClickListener(view -> showQuickFolder());
         binding.webSearch.setOnClickListener(
                 view -> openWebSearch(binding.appSearch.getQuery().toString()));
         ArrayAdapter<CharSequence> drawerGroupAdapter = ArrayAdapter.createFromResource(
@@ -196,6 +200,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     @Override
     protected void onResume() {
         super.onResume();
+        quickFolder = new QuickFolder(preferences.quickFolderAppIds());
         applyDisplayPreferences();
         if (appsLoaded) {
             loadApps();
@@ -352,6 +357,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 appsLoaded = true;
                 removeUnavailableSavedApps();
                 displayFavorites();
+                displayQuickFolder();
                 refreshAppResults();
             });
         });
@@ -374,6 +380,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         }
         if (hiddenApps.retainAvailable(availableAppIds)) {
             saveHiddenApps();
+        }
+        if (quickFolder.retainAvailable(availableAppIds)) {
+            preferences.setQuickFolderAppIds(quickFolder.snapshot());
         }
     }
 
@@ -403,6 +412,45 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         boolean hasFavorites = !favorites.isEmpty();
         binding.favoriteList.setVisibility(hasFavorites ? View.VISIBLE : View.GONE);
         binding.favoritesEmpty.setVisibility(hasFavorites ? View.GONE : View.VISIBLE);
+    }
+
+    private List<AppEntry> quickFolderApps() {
+        List<AppEntry> apps = new ArrayList<>();
+        Set<String> includedIds = quickFolder.snapshot();
+        for (AppEntry app : allApps) {
+            if (includedIds.contains(app.getId()) && !hiddenApps.contains(app.getId())) {
+                apps.add(app);
+            }
+        }
+        return apps;
+    }
+
+    private void displayQuickFolder() {
+        List<AppEntry> apps = quickFolderApps();
+        boolean hasApps = !apps.isEmpty();
+        binding.quickFolder.setVisibility(hasApps ? View.VISIBLE : View.GONE);
+        if (hasApps) {
+            binding.quickFolder.setText(getString(
+                    R.string.quick_folder_button,
+                    preferences.quickFolderName(),
+                    apps.size()));
+        }
+    }
+
+    private void showQuickFolder() {
+        List<AppEntry> apps = quickFolderApps();
+        if (apps.isEmpty()) {
+            return;
+        }
+        String[] labels = new String[apps.size()];
+        for (int index = 0; index < apps.size(); index++) {
+            labels[index] = apps.get(index).getLabel();
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(preferences.quickFolderName())
+                .setItems(labels, (dialog, index) -> onOpenApp(apps.get(index)))
+                .setNegativeButton(R.string.close, null)
+                .show();
     }
 
     private void saveFavorites() {

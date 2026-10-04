@@ -17,6 +17,8 @@ final class LauncherBackupData {
     private final int drawerGroup;
     private final Set<String> favoriteAppIds;
     private final Set<String> hiddenAppIds;
+    private final String quickFolderName;
+    private final Set<String> quickFolderAppIds;
 
     LauncherBackupData(
             int gridColumns,
@@ -28,7 +30,9 @@ final class LauncherBackupData {
             boolean showContextCard,
             int drawerGroup,
             Set<String> favoriteAppIds,
-            Set<String> hiddenAppIds) {
+            Set<String> hiddenAppIds,
+            String quickFolderName,
+            Set<String> quickFolderAppIds) {
         this.gridColumns = gridColumns;
         this.showAppLabels = showAppLabels;
         this.themeMode = themeMode;
@@ -39,6 +43,9 @@ final class LauncherBackupData {
         this.drawerGroup = drawerGroup;
         this.favoriteAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(favoriteAppIds));
         this.hiddenAppIds = Collections.unmodifiableSet(new LinkedHashSet<>(hiddenAppIds));
+        this.quickFolderName = quickFolderName;
+        this.quickFolderAppIds = Collections.unmodifiableSet(
+                new LinkedHashSet<>(quickFolderAppIds));
     }
 
     int gridColumns() { return gridColumns; }
@@ -51,4 +58,6 @@ final class LauncherBackupData {
     int drawerGroup() { return drawerGroup; }
     Set<String> favoriteAppIds() { return favoriteAppIds; }
     Set<String> hiddenAppIds() { return hiddenAppIds; }
+    String quickFolderName() { return quickFolderName; }
+    Set<String> quickFolderAppIds() { return quickFolderAppIds; }
 }

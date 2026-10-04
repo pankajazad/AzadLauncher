@@ -23,6 +23,8 @@ final class LauncherPreferences {
     private static final String WEB_SEARCH_PROVIDER_KEY = "web_search_provider";
     private static final String SHOW_CONTEXT_CARD_KEY = "show_context_card";
     private static final String DRAWER_GROUP_KEY = "drawer_group";
+    private static final String QUICK_FOLDER_NAME_KEY = "quick_folder_name";
+    private static final String QUICK_FOLDER_APP_IDS_KEY = "quick_folder_app_ids";
 
     private final SharedPreferences preferences;
 
@@ -151,6 +153,28 @@ final class LauncherPreferences {
         preferences.edit().putInt(DRAWER_GROUP_KEY, drawerGroup).apply();
     }
 
+    String quickFolderName() {
+        return QuickFolder.normalizeName(preferences.getString(
+                QUICK_FOLDER_NAME_KEY, QuickFolder.DEFAULT_NAME));
+    }
+
+    void setQuickFolderName(String name) {
+        preferences.edit()
+                .putString(QUICK_FOLDER_NAME_KEY, QuickFolder.normalizeName(name))
+                .apply();
+    }
+
+    Set<String> quickFolderAppIds() {
+        return new HashSet<>(preferences.getStringSet(
+                QUICK_FOLDER_APP_IDS_KEY, Collections.emptySet()));
+    }
+
+    void setQuickFolderAppIds(Set<String> appIds) {
+        preferences.edit()
+                .putStringSet(QUICK_FOLDER_APP_IDS_KEY, new HashSet<>(appIds))
+                .apply();
+    }
+
     LauncherBackupData backupData() {
         return new LauncherBackupData(
                 gridColumns(),
@@ -162,7 +186,9 @@ final class LauncherPreferences {
                 showContextCard(),
                 drawerGroup(),
                 favoriteAppIds(),
-                hiddenAppIds());
+                hiddenAppIds(),
+                quickFolderName(),
+                quickFolderAppIds());
     }
 
     void restore(LauncherBackupData backupData) {
@@ -175,6 +201,10 @@ final class LauncherPreferences {
                 .putInt(WEB_SEARCH_PROVIDER_KEY, backupData.webSearchProvider())
                 .putBoolean(SHOW_CONTEXT_CARD_KEY, backupData.showContextCard())
                 .putInt(DRAWER_GROUP_KEY, backupData.drawerGroup())
+                .putString(QUICK_FOLDER_NAME_KEY, backupData.quickFolderName())
+                .putStringSet(
+                        QUICK_FOLDER_APP_IDS_KEY,
+                        new HashSet<>(backupData.quickFolderAppIds()))
                 .putStringSet(FAVORITE_APP_IDS_KEY, new HashSet<>(backupData.favoriteAppIds()))
                 .putString(FAVORITE_APP_ORDER_KEY, serializeFavoriteOrder(backupData.favoriteAppIds()))
                 .putStringSet(HIDDEN_APP_IDS_KEY, new HashSet<>(backupData.hiddenAppIds()))

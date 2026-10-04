@@ -139,6 +139,8 @@ public final class SettingsActivity extends AppCompatActivity {
                 (buttonView, isChecked) -> preferences.setShowContextCard(isChecked));
         binding.manageHiddenApps.setOnClickListener(
                 view -> startActivity(new Intent(this, HiddenAppsActivity.class)));
+        binding.manageQuickFolder.setOnClickListener(
+                view -> startActivity(new Intent(this, QuickFolderActivity.class)));
         binding.notificationAccess.setOnClickListener(
                 view -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)));
         binding.exportSettings.setOnClickListener(

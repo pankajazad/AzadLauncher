@@ -31,6 +31,12 @@
     <string name="web_search_unavailable">No web browser is available</string>
     <string name="appearance">Appearance</string>
     <string name="manage_hidden_apps">Manage hidden apps</string>
+    <string name="manage_quick_folder">Manage Quick Folder</string>
+    <string name="quick_folder_description">Rename the folder and choose which apps it contains.</string>
+    <string name="folder_name">Folder name</string>
+    <string name="include_in_folder">Include in folder</string>
+    <string name="quick_folder_button">%1$s (%2$d)</string>
+    <string name="close">Close</string>
     <string name="notification_dots">Notification dots</string>
     <string name="notification_dots_description">Show a dot on apps with active notifications. Android notification access must be granted explicitly.</string>
     <string name="manage_notification_access">Manage notification access</string>
@@ -40,7 +46,7 @@
     <string name="hidden_apps_description">Checked apps are omitted from the app drawer and favorites.</string>
     <string name="hide_app">Hide app</string>
     <string name="backup_and_restore">Backup and restore</string>
-    <string name="backup_description">Save or restore favorites, hidden apps, and display preferences.</string>
+    <string name="backup_description">Save or restore favorites, folders, hidden apps, and display preferences.</string>
     <string name="export_settings">Export settings</string>
     <string name="import_settings">Import settings</string>
     <string name="backup_exported">Backup exported</string>

@@ -22,11 +22,15 @@ final class BackupCodec {
         backup.append("webSearchProvider=").append(data.webSearchProvider()).append('\n');
         backup.append("showContextCard=").append(data.showContextCard()).append('\n');
         backup.append("drawerGroup=").append(data.drawerGroup()).append('\n');
+        backup.append("quickFolderName=").append(encodeAppId(data.quickFolderName())).append('\n');
         for (String appId : data.favoriteAppIds()) {
             backup.append("favorite=").append(encodeAppId(appId)).append('\n');
         }
         for (String appId : new TreeSet<>(data.hiddenAppIds())) {
             backup.append("hidden=").append(encodeAppId(appId)).append('\n');
+        }
+        for (String appId : new TreeSet<>(data.quickFolderAppIds())) {
+            backup.append("quickFolderApp=").append(encodeAppId(appId)).append('\n');
         }
         return backup.toString();
     }
@@ -44,8 +48,10 @@ final class BackupCodec {
         int webSearchProvider = WebSearchProvider.DISABLED;
         boolean showContextCard = true;
         int drawerGroup = DrawerGroupConfiguration.ALL;
+        String quickFolderName = QuickFolder.DEFAULT_NAME;
         Set<String> favorites = new LinkedHashSet<>();
         Set<String> hidden = new LinkedHashSet<>();
+        Set<String> quickFolderApps = new LinkedHashSet<>();
         for (String line : backup.split("\\r?\\n")) {
             if (line.isEmpty()) {
                 continue;
@@ -90,11 +96,17 @@ final class BackupCodec {
                 case "drawerGroup":
                     drawerGroup = parseInteger(value, "drawer group");
                     break;
+                case "quickFolderName":
+                    quickFolderName = decodeAppId(value);
+                    break;
                 case "favorite":
                     favorites.add(decodeAppId(value));
                     break;
                 case "hidden":
                     hidden.add(decodeAppId(value));
+                    break;
+                case "quickFolderApp":
+                    quickFolderApps.add(decodeAppId(value));
                     break;
                 default:
                     // Ignore future optional fields while retaining strict validation of known fields.
@@ -125,6 +137,9 @@ final class BackupCodec {
         if (!DrawerGroupConfiguration.isValidPreference(drawerGroup)) {
             throw new IllegalArgumentException("Invalid drawer group");
         }
+        if (!QuickFolder.isValidName(quickFolderName)) {
+            throw new IllegalArgumentException("Invalid quick folder name");
+        }
         return new LauncherBackupData(
                 gridColumns,
                 showAppLabels,
@@ -135,7 +150,9 @@ final class BackupCodec {
                 showContextCard,
                 drawerGroup,
                 favorites,
-                hidden);
+                hidden,
+                quickFolderName,
+                quickFolderApps);
     }
 
     private static int parseInteger(String value, String field) {

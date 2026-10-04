@@ -18,6 +18,9 @@
             android:name=".HiddenAppsActivity"
             android:exported="false" />
         <activity
+            android:name=".QuickFolderActivity"
+            android:exported="false" />
+        <activity
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity

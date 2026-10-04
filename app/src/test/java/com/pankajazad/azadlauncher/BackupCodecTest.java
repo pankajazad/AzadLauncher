@@ -25,7 +25,9 @@ public class BackupCodecTest {
                 false,
                 DrawerGroupConfiguration.PRODUCTIVITY,
                 new LinkedHashSet<>(Arrays.asList("one/Activity", "two/Activity")),
-                Collections.singleton("hidden/Activity"));
+                Collections.singleton("hidden/Activity"),
+                "Travel & tools",
+                Collections.singleton("map/Activity"));
 
         LauncherBackupData decoded = BackupCodec.decode(BackupCodec.encode(source));
 
@@ -42,6 +44,8 @@ public class BackupCodecTest {
                 new ArrayList<>(source.favoriteAppIds()),
                 new ArrayList<>(decoded.favoriteAppIds()));
         assertEquals(source.hiddenAppIds(), decoded.hiddenAppIds());
+        assertEquals("Travel & tools", decoded.quickFolderName());
+        assertEquals(source.quickFolderAppIds(), decoded.quickFolderAppIds());
     }
 
     @Test
@@ -56,6 +60,8 @@ public class BackupCodecTest {
                 true,
                 DrawerGroupConfiguration.ALL,
                 Collections.emptySet(),
+                Collections.emptySet(),
+                QuickFolder.DEFAULT_NAME,
                 Collections.emptySet());
 
         LauncherBackupData decoded = BackupCodec.decode(BackupCodec.encode(source));
@@ -70,6 +76,8 @@ public class BackupCodecTest {
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
         assertTrue(decoded.favoriteAppIds().isEmpty());
         assertTrue(decoded.hiddenAppIds().isEmpty());
+        assertEquals(QuickFolder.DEFAULT_NAME, decoded.quickFolderName());
+        assertTrue(decoded.quickFolderAppIds().isEmpty());
     }
 
     @Test
@@ -102,6 +110,7 @@ public class BackupCodecTest {
         assertEquals(WebSearchProvider.DISABLED, decoded.webSearchProvider());
         assertTrue(decoded.showContextCard());
         assertEquals(DrawerGroupConfiguration.ALL, decoded.drawerGroup());
+        assertEquals(QuickFolder.DEFAULT_NAME, decoded.quickFolderName());
     }
 
     @Test
@@ -156,6 +165,17 @@ public class BackupCodecTest {
             fail("Expected invalid drawer group to be rejected");
         } catch (IllegalArgumentException expected) {
             assertTrue(expected.getMessage().contains("drawer group"));
+        }
+    }
+
+    @Test
+    public void invalidQuickFolderNameIsRejected() {
+        try {
+            BackupCodec.decode(
+                    "version=1\ngridColumns=4\nshowAppLabels=true\nquickFolderName=\n");
+            fail("Expected invalid quick folder name to be rejected");
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("encoded app id"));
         }
     }
 }
