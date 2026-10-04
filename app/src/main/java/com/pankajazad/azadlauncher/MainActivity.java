@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.BatteryManager;
+import android.provider.Settings;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
@@ -485,6 +486,53 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
 
     @Override
     public boolean onLongPressApp(AppEntry app) {
+        showAppActions(app);
+        return true;
+    }
+
+    private void showAppActions(AppEntry app) {
+        boolean favorite = favoriteApps.contains(app.getId());
+        boolean inQuickFolder = quickFolder.contains(app.getId());
+        String folderName = preferences.quickFolderName();
+        String[] actions = {
+                getString(favorite ? R.string.unpin_from_favorites : R.string.pin_to_favorites),
+                getString(
+                        inQuickFolder ? R.string.remove_from_folder : R.string.add_to_folder,
+                        folderName),
+                getString(R.string.hide_app_action),
+                getString(R.string.open_app_info),
+                getString(R.string.uninstall_app)
+        };
+        new AlertDialog.Builder(this)
+                .setTitle(app.getLabel())
+                .setItems(actions, (dialog, index) -> performAppAction(app, index))
+                .setNegativeButton(R.string.close, null)
+                .show();
+    }
+
+    private void performAppAction(AppEntry app, int actionIndex) {
+        switch (actionIndex) {
+            case 0:
+                toggleFavorite(app);
+                break;
+            case 1:
+                toggleQuickFolderMembership(app);
+                break;
+            case 2:
+                hideApp(app);
+                break;
+            case 3:
+                openAppInfo(app);
+                break;
+            case 4:
+                requestUninstall(app);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void toggleFavorite(AppEntry app) {
         boolean pinned = favoriteApps.toggle(app.getId());
         saveFavorites();
         displayFavorites();
@@ -493,7 +541,56 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 getString(pinned ? R.string.app_pinned : R.string.app_unpinned, app.getLabel()),
                 Toast.LENGTH_SHORT)
                 .show();
-        return true;
+    }
+
+    private void toggleQuickFolderMembership(AppEntry app) {
+        boolean included = !quickFolder.contains(app.getId());
+        if (quickFolder.setIncluded(app.getId(), included)) {
+            preferences.setQuickFolderAppIds(quickFolder.snapshot());
+            displayQuickFolder();
+        }
+        Toast.makeText(
+                this,
+                getString(
+                        included ? R.string.app_added_to_folder : R.string.app_removed_from_folder,
+                        app.getLabel(),
+                        preferences.quickFolderName()),
+                Toast.LENGTH_SHORT)
+                .show();
+    }
+
+    private void hideApp(AppEntry app) {
+        if (hiddenApps.setHidden(app.getId(), true)) {
+            saveHiddenApps();
+            displayFavorites();
+            displayQuickFolder();
+            refreshAppResults();
+        }
+        Toast.makeText(
+                this,
+                getString(R.string.app_hidden, app.getLabel()),
+                Toast.LENGTH_SHORT)
+                .show();
+    }
+
+    private void openAppInfo(AppEntry app) {
+        openPackageAction(
+                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        .setData(Uri.fromParts("package", app.getPackageName(), null)));
+    }
+
+    private void requestUninstall(AppEntry app) {
+        openPackageAction(new Intent(
+                Intent.ACTION_DELETE,
+                Uri.fromParts("package", app.getPackageName(), null)));
+    }
+
+    private void openPackageAction(Intent intent) {
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException exception) {
+            Toast.makeText(this, R.string.app_management_unavailable, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

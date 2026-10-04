@@ -13,6 +13,10 @@ final class QuickFolder {
         this.appIds = new HashSet<>(appIds);
     }
 
+    boolean contains(String appId) {
+        return appIds.contains(appId);
+    }
+
     boolean setIncluded(String appId, boolean included) {
         return included ? appIds.add(appId) : appIds.remove(appId);
     }

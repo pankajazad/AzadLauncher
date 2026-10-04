@@ -17,6 +17,7 @@ This backlog tracks original, independently designed launcher capabilities.
 - Optional localized date and battery context card
 - Persistent category-based drawer groups
 - Renameable Quick Folder with searchable membership management
+- Long-press app shortcuts for favorites, folders, hiding, app info, and uninstall
 - Searchable hidden-app management
 - Portable local backup and restore for launcher settings
 - Unit-test, lint, and debug-APK build gates

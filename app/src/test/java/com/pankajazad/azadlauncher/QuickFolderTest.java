@@ -17,6 +17,7 @@ public class QuickFolderTest {
                 new HashSet<>(Arrays.asList("one/Activity", "missing/Activity")));
 
         assertTrue(folder.setIncluded("two/Activity", true));
+        assertTrue(folder.contains("two/Activity"));
         assertFalse(folder.setIncluded("two/Activity", true));
         assertTrue(folder.retainAvailable(new HashSet<>(
                 Arrays.asList("one/Activity", "two/Activity"))));
@@ -24,6 +25,7 @@ public class QuickFolderTest {
         assertEquals(
                 new HashSet<>(Arrays.asList("one/Activity", "two/Activity")),
                 folder.snapshot());
+        assertFalse(folder.contains("missing/Activity"));
     }
 
     @Test
