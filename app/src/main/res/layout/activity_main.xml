@@ -73,6 +73,24 @@
             android:text="@string/customize" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/favorites_empty"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favorite_list"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/quick_folder"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/drawer_panel"
         android:layout_width="match_parent"
