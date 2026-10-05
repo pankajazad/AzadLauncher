@@ -15,7 +15,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.Map;
 
-final class HomeWorkspaceView extends FrameLayout {
+public final class HomeWorkspaceView extends FrameLayout {
     interface Listener {
         void onHomeAppClick(AppEntry app);
         void onAppMoved(String appId, int cellX, int cellY);
@@ -28,7 +28,7 @@ final class HomeWorkspaceView extends FrameLayout {
     private int columns = 5;
     private int rows = 8;
 
-    HomeWorkspaceView(Context context, Listener listener) {
+    public HomeWorkspaceView(Context context, Listener listener) {
         super(context);
         this.listener = listener;
         setClipChildren(false);
