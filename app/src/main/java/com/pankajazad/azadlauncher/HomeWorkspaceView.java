@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.View;
@@ -22,7 +23,7 @@ public final class HomeWorkspaceView extends FrameLayout {
         void onEmptyLongPress();
     }
 
-    private final Listener listener;
+    private Listener listener;
     private final Map<String, View> appViews = new HashMap<>();
     private final Map<View, String> viewAppIds = new HashMap<>();
     private int columns = 5;
@@ -51,6 +52,14 @@ public final class HomeWorkspaceView extends FrameLayout {
             listener.onEmptyLongPress();
             return true;
         });
+    }
+
+    public HomeWorkspaceView(Context context, AttributeSet attrs) {
+        this(context, null);
+    }
+
+    void setListener(Listener listener) {
+        this.listener = listener;
     }
 
     void setGrid(int columns, int rows) {
