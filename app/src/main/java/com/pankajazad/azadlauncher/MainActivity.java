@@ -51,6 +51,7 @@ import java.util.Date;
 public final class MainActivity extends AppCompatActivity implements AppActionListener {
     private static final int APPWIDGET_PICK_REQUEST = 4101;
     private static final int APPWIDGET_CONFIGURE_REQUEST = 4102;
+    private static final int APPWIDGET_BIND_REQUEST = 4103;
     private static final int APPWIDGET_HOST_ID = 4100;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -641,14 +642,32 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         }
         if (requestCode == APPWIDGET_PICK_REQUEST) {
             AppWidgetProviderInfo info = AppWidgetManager.getInstance(this).getAppWidgetInfo(pendingWidgetId);
-            if (info != null && info.configure != null) {
+            if (info == null) return;
+            if (!AppWidgetManager.getInstance(this).bindAppWidgetIdIfAllowed(
+                    pendingWidgetId, info.provider)) {
+                Intent bind = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+                bind.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
+                bind.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider);
+                startActivityForResult(bind, APPWIDGET_BIND_REQUEST);
+                return;
+            }
+            if (info.configure != null) {
                 Intent configure = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).setComponent(info.configure);
                 configure.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
                 startActivityForResult(configure, APPWIDGET_CONFIGURE_REQUEST);
             } else {
                 finishAddingWidget();
             }
-        } else if (requestCode == APPWIDGET_CONFIGURE_REQUEST) {
+        } else if (requestCode == APPWIDGET_CONFIGURE_REQUEST || requestCode == APPWIDGET_BIND_REQUEST) {
+            if (requestCode == APPWIDGET_BIND_REQUEST) {
+                AppWidgetProviderInfo info = AppWidgetManager.getInstance(this).getAppWidgetInfo(pendingWidgetId);
+                if (info != null && info.configure != null) {
+                    Intent configure = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).setComponent(info.configure);
+                    configure.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
+                    startActivityForResult(configure, APPWIDGET_CONFIGURE_REQUEST);
+                    return;
+                }
+            }
             finishAddingWidget();
         }
     }
