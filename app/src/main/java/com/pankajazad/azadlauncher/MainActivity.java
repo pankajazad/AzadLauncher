@@ -67,6 +67,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
+    private boolean widgetsRestored;
     private float gestureStartX;
     private float gestureStartY;
     private long gestureStartTime;
@@ -93,7 +94,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         setContentView(binding.getRoot());
         appWidgetHost = new AppWidgetHost(this, APPWIDGET_HOST_ID);
         appWidgetHost.startListening();
-        binding.workspace.setGrid(spanCount(), 8);
+        binding.workspace.setGrid(5, 8);
         binding.openDrawer.setOnClickListener(view -> showDrawer(true));
         binding.closeDrawer.setOnClickListener(view -> showDrawer(false));
         binding.addWidget.setOnClickListener(view -> pickWidget());
@@ -190,7 +191,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             }
         });
         loadApps();
-        restoreWidgets();
+        binding.workspace.post(this::restoreWidgets);
     }
 
     @Override
@@ -247,7 +248,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         if (appsLoaded) {
             loadApps();
         }
-        restoreWidgets();
+        if (!widgetsRestored) restoreWidgets();
     }
 
     @Override
@@ -329,6 +330,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void focusAppSearch() {
+        showDrawer(true);
         binding.appSearch.setIconified(false);
         View searchInput = binding.appSearch.findViewById(androidx.appcompat.R.id.search_src_text);
         searchInput.requestFocus();
@@ -576,8 +578,9 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void restoreWidgets() {
-        if (appWidgetHost == null) return;
+        if (appWidgetHost == null || widgetsRestored) return;
         AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        widgetsRestored = true;
         for (String entry : preferences.homeWidgetEntries()) {
             String[] p = entry.split("\\\\|");
             if (p.length < 6) continue;
