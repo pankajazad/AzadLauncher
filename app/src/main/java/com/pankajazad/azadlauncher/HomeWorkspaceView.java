@@ -18,7 +18,6 @@ import java.util.Map;
 final class HomeWorkspaceView extends FrameLayout {
     interface Listener {
         void onHomeAppClick(AppEntry app);
-        void onHomeAppLongPress(AppEntry app);
         void onAppMoved(String appId, int cellX, int cellY);
         void onEmptyLongPress();
     }
@@ -94,7 +93,6 @@ final class HomeWorkspaceView extends FrameLayout {
         item.setOnLongClickListener(v -> {
             ClipData data = ClipData.newPlainText("azad-home-app", app.getId());
             v.startDragAndDrop(data, new View.DragShadowBuilder(v), v, 0);
-            listener.onHomeAppLongPress(app);
             return true;
         });
         item.setTag(new HomeTag(cellX, cellY));
