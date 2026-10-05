@@ -116,4 +116,8 @@
         <item>Category, then name</item>
         <item>Recently used</item>
     </string-array>
+    <string name="all_apps">All apps</string>
+    <string name="add_widget">Add widget</string>
+    <string name="add_to_home">Add to home screen</string>
+    <string name="app_already_on_home">App is already on the home screen</string>
 </resources>
