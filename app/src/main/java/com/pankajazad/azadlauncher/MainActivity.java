@@ -94,6 +94,22 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         setContentView(binding.getRoot());
         appWidgetHost = new AppWidgetHost(this, APPWIDGET_HOST_ID);
         appWidgetHost.startListening();
+        binding.workspace.setListener(new HomeWorkspaceView.Listener() {
+            @Override public void onHomeAppClick(AppEntry app) { onOpenApp(app); }
+            @Override public void onAppMoved(String appId, int cellX, int cellY) {
+                preferences.setHomeAppPosition(appId, cellX, cellY);
+            }
+            @Override public void onEmptyLongPress() {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setItems(new String[] { getString(R.string.add_widget), getString(R.string.all_apps), getString(R.string.customize) },
+                                (dialog, which) -> {
+                                    if (which == 0) pickWidget();
+                                    else if (which == 1) showDrawer(true);
+                                    else startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                                })
+                        .show();
+            }
+        });
         binding.workspace.setGrid(5, 8);
         binding.openDrawer.setOnClickListener(view -> showDrawer(true));
         binding.closeDrawer.setOnClickListener(view -> showDrawer(false));
