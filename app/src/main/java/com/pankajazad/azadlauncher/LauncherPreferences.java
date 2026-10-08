@@ -104,12 +104,6 @@ final class LauncherPreferences {
     }
 
     void setIconSize(int iconSize) {
-        return IconSizeConfiguration.isValidPreference(storedSize)
-                ? storedSize
-                : IconSizeConfiguration.STANDARD;
-    }
-
-    void setIconSize(int iconSize) {
         preferences.edit().putInt(ICON_SIZE_KEY, iconSize).apply();
     }
 
@@ -157,10 +151,6 @@ final class LauncherPreferences {
     }
 
     boolean allowHomeRotation() {
-        return preferences.getBoolean(ALLOW_HOME_ROTATION_KEY, false);
-    }
-
-    void setAllowHomeRotation(boolean allowHomeRotation) {
         return preferences.getBoolean(ALLOW_HOME_ROTATION_KEY, false);
     }
 
