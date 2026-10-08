@@ -1,6 +1,11 @@
 package com.pankajazad.azadlauncher;
 
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetHostView;
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -44,7 +49,15 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public final class MainActivity extends AppCompatActivity implements AppActionListener {
+    private static final int APPWIDGET_PICK_REQUEST = 4101;
+    private static final int APPWIDGET_CONFIGURE_REQUEST = 4102;
+    private static final int APPWIDGET_BIND_REQUEST = 4103;
+    private static final int APPWIDGET_HOST_ID = 4100;
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private AppWidgetHost appWidgetHost;
+    private int pendingWidgetId = AppWidgetHost.INVALID_APPWIDGET_ID;
+    private ComponentName pendingWidgetProvider;
     private ActivityMainBinding binding;
     private AppListAdapter appListAdapter;
     private FavoriteListAdapter favoriteListAdapter;
@@ -55,6 +68,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     private LauncherPreferences preferences;
     private List<AppEntry> allApps = Collections.emptyList();
     private boolean appsLoaded;
+    private boolean widgetsRestored;
     private float gestureStartX;
     private float gestureStartY;
     private long gestureStartTime;
@@ -79,6 +93,28 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        appWidgetHost = new AppWidgetHost(this, APPWIDGET_HOST_ID);
+        appWidgetHost.startListening();
+        binding.workspace.setListener(new HomeWorkspaceView.Listener() {
+            @Override public void onHomeAppClick(AppEntry app) { onOpenApp(app); }
+            @Override public void onAppMoved(String appId, int cellX, int cellY) {
+                preferences.setHomeAppPosition(appId, cellX, cellY);
+            }
+            @Override public void onEmptyLongPress() {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setItems(new String[] { getString(R.string.add_widget), getString(R.string.all_apps), getString(R.string.customize) },
+                                (dialog, which) -> {
+                                    if (which == 0) pickWidget();
+                                    else if (which == 1) showDrawer(true);
+                                    else startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                                })
+                        .show();
+            }
+        });
+        binding.workspace.setGrid(5, 8);
+        binding.openDrawer.setOnClickListener(view -> showDrawer(true));
+        binding.closeDrawer.setOnClickListener(view -> showDrawer(false));
+        binding.addWidget.setOnClickListener(view -> pickWidget());
         appListAdapter = new AppListAdapter(this);
         favoriteListAdapter = new FavoriteListAdapter(this, this::reorderFavorites);
         preferences = new LauncherPreferences(this);
@@ -172,6 +208,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             }
         });
         loadApps();
+        binding.workspace.post(this::restoreWidgets);
     }
 
     @Override
@@ -224,9 +261,11 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         super.onResume();
         quickFolder = new QuickFolder(preferences.quickFolderAppIds());
         applyDisplayPreferences();
+        binding.workspace.setGrid(spanCount(), 8);
         if (appsLoaded) {
             loadApps();
         }
+        if (!widgetsRestored) restoreWidgets();
     }
 
     @Override
@@ -266,6 +305,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         int columns = GridConfiguration.resolveColumns(
                 preferences.gridColumns(),
                 getResources().getConfiguration().screenWidthDp);
+        binding.workspace.setGrid(columns, 8);
         GridLayoutManager layoutManager = (GridLayoutManager) binding.appList.getLayoutManager();
         if (layoutManager != null && layoutManager.getSpanCount() != columns) {
             layoutManager.setSpanCount(columns);
@@ -307,6 +347,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
     }
 
     private void focusAppSearch() {
+        showDrawer(true);
         binding.appSearch.setIconified(false);
         View searchInput = binding.appSearch.findViewById(androidx.appcompat.R.id.search_src_text);
         searchInput.requestFocus();
@@ -382,6 +423,8 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
             runOnUiThread(() -> {
                 allApps = loadedApps;
                 appsLoaded = true;
+                ensureInitialHomeApps();
+                displayHomeApps();
                 removeUnavailableSavedApps();
                 displayFavorites();
                 displayQuickFolder();
@@ -485,6 +528,150 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 .show();
     }
 
+    private void showDrawer(boolean visible) {
+        binding.drawerPanel.setVisibility(visible ? View.VISIBLE : View.GONE);
+        binding.homeControls.setVisibility(visible ? View.GONE : View.VISIBLE);
+    }
+
+    private void ensureInitialHomeApps() {
+        if (!preferences.homeAppPositions().isEmpty()) return;
+        Map<String, int[]> positions = new HashMap<>();
+        int index = 0;
+        for (String id : favoriteApps.snapshot()) {
+            if (index >= 5) break;
+            positions.put(id, new int[] { index, 6 });
+            index++;
+        }
+        for (AppEntry app : allApps) {
+            if (index >= 5) break;
+            if (!positions.containsKey(app.getId()) && !hiddenApps.contains(app.getId())) {
+                positions.put(app.getId(), new int[] { index, 6 });
+                index++;
+            }
+        }
+        preferences.setHomeAppPositions(positions);
+    }
+
+    private void displayHomeApps() {
+        Map<String, int[]> positions = preferences.homeAppPositions();
+        Map<String, AppEntry> apps = new HashMap<>();
+        for (AppEntry app : allApps) apps.put(app.getId(), app);
+        for (Map.Entry<String, int[]> entry : positions.entrySet()) {
+            AppEntry app = apps.get(entry.getKey());
+            if (app != null && !hiddenApps.contains(app.getId())) {
+                binding.workspace.addApp(app, entry.getValue()[0], entry.getValue()[1]);
+            }
+        }
+    }
+
+    private void addAppToHome(AppEntry app) {
+        Map<String, int[]> positions = preferences.homeAppPositions();
+        if (positions.containsKey(app.getId())) {
+            Toast.makeText(this, R.string.app_already_on_home, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for (int y = 0; y < 8; y++) {
+            boolean placed = false;
+            for (int x = 0; x < spanCount(); x++) {
+                boolean occupied = false;
+                for (int[] p : positions.values()) {
+                    if (p[0] == x && p[1] == y) { occupied = true; break; }
+                }
+                if (!occupied) { positions.put(app.getId(), new int[] { x, y }); placed = true; break; }
+            }
+            if (placed) break;
+        }
+        preferences.setHomeAppPositions(positions);
+        displayHomeApps();
+        showDrawer(false);
+    }
+
+    private void pickWidget() {
+        int id = appWidgetHost.allocateAppWidgetId();
+        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+        pendingWidgetId = id;
+        startActivityForResult(intent, APPWIDGET_PICK_REQUEST);
+    }
+
+    private void restoreWidgets() {
+        if (appWidgetHost == null || widgetsRestored) return;
+        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        widgetsRestored = true;
+        for (String entry : preferences.homeWidgetEntries()) {
+            String[] p = entry.split("\\\\|");
+            if (p.length < 6) continue;
+            try {
+                int id = Integer.parseInt(p[0]);
+                AppWidgetProviderInfo info = manager.getAppWidgetInfo(id);
+                if (info == null) continue;
+                AppWidgetHostView view = appWidgetHost.createView(this, id, info);
+                addWidgetView(view, Integer.parseInt(p[2]), Integer.parseInt(p[3]), Integer.parseInt(p[4]), Integer.parseInt(p[5]));
+            } catch (NumberFormatException ignored) { }
+        }
+    }
+
+    private void addWidgetView(AppWidgetHostView view, int cellX, int cellY, int spanX, int spanY) {
+        int width = Math.max(1, binding.workspace.getWidth() / spanCount());
+        int height = Math.max(1, binding.workspace.getHeight() / 8);
+        android.widget.FrameLayout.LayoutParams lp = new android.widget.FrameLayout.LayoutParams(width * spanX, height * spanY);
+        lp.leftMargin = cellX * width;
+        lp.topMargin = cellY * height;
+        binding.workspace.addView(view, lp);
+    }
+
+    private void finishAddingWidget() {
+        if (pendingWidgetId == AppWidgetHost.INVALID_APPWIDGET_ID) return;
+        AppWidgetProviderInfo info = AppWidgetManager.getInstance(this).getAppWidgetInfo(pendingWidgetId);
+        if (info == null) return;
+        AppWidgetHostView view = appWidgetHost.createView(this, pendingWidgetId, info);
+        addWidgetView(view, 0, 0, Math.min(2, spanCount()), 2);
+        Set<String> entries = preferences.homeWidgetEntries();
+        entries.add(pendingWidgetId + "|" + info.provider.flattenToString() + "|0|0|2|2");
+        preferences.setHomeWidgetEntries(entries);
+        pendingWidgetId = AppWidgetHost.INVALID_APPWIDGET_ID;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK || data == null) {
+            if (pendingWidgetId != AppWidgetHost.INVALID_APPWIDGET_ID) appWidgetHost.deleteAppWidgetId(pendingWidgetId);
+            pendingWidgetId = AppWidgetHost.INVALID_APPWIDGET_ID;
+            return;
+        }
+        if (requestCode == APPWIDGET_PICK_REQUEST) {
+            AppWidgetProviderInfo info = AppWidgetManager.getInstance(this).getAppWidgetInfo(pendingWidgetId);
+            if (info == null) return;
+            if (!AppWidgetManager.getInstance(this).bindAppWidgetIdIfAllowed(
+                    pendingWidgetId, info.provider)) {
+                Intent bind = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+                bind.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
+                bind.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, info.provider);
+                startActivityForResult(bind, APPWIDGET_BIND_REQUEST);
+                return;
+            }
+            if (info.configure != null) {
+                Intent configure = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).setComponent(info.configure);
+                configure.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
+                startActivityForResult(configure, APPWIDGET_CONFIGURE_REQUEST);
+            } else {
+                finishAddingWidget();
+            }
+        } else if (requestCode == APPWIDGET_CONFIGURE_REQUEST || requestCode == APPWIDGET_BIND_REQUEST) {
+            if (requestCode == APPWIDGET_BIND_REQUEST) {
+                AppWidgetProviderInfo info = AppWidgetManager.getInstance(this).getAppWidgetInfo(pendingWidgetId);
+                if (info != null && info.configure != null) {
+                    Intent configure = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE).setComponent(info.configure);
+                    configure.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, pendingWidgetId);
+                    startActivityForResult(configure, APPWIDGET_CONFIGURE_REQUEST);
+                    return;
+                }
+            }
+            finishAddingWidget();
+        }
+    }
+
     private void saveFavorites() {
         preferences.setFavoriteAppIds(favoriteApps.snapshot());
     }
@@ -530,6 +717,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
         String folderName = preferences.quickFolderName();
         String[] actions = {
                 getString(favorite ? R.string.unpin_from_favorites : R.string.pin_to_favorites),
+                getString(R.string.add_to_home),
                 getString(
                         inQuickFolder ? R.string.remove_from_folder : R.string.add_to_folder,
                         folderName),
@@ -550,15 +738,18 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
                 toggleFavorite(app);
                 break;
             case 1:
-                toggleQuickFolderMembership(app);
+                addAppToHome(app);
                 break;
             case 2:
-                hideApp(app);
+                toggleQuickFolderMembership(app);
                 break;
             case 3:
-                openAppInfo(app);
+                hideApp(app);
                 break;
             case 4:
+                openAppInfo(app);
+                break;
+            case 5:
                 requestUninstall(app);
                 break;
             default:
@@ -629,6 +820,7 @@ public final class MainActivity extends AppCompatActivity implements AppActionLi
 
     @Override
     protected void onDestroy() {
+        if (appWidgetHost != null) appWidgetHost.stopListening();
         executor.shutdownNow();
         super.onDestroy();
     }

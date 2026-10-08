@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,6 +31,8 @@ final class LauncherPreferences {
     private static final String RECENT_APP_ORDER_KEY = "recent_app_order";
     private static final String QUICK_FOLDER_NAME_KEY = "quick_folder_name";
     private static final String QUICK_FOLDER_APP_IDS_KEY = "quick_folder_app_ids";
+    private static final String HOME_APP_POSITIONS_KEY = "home_app_positions";
+    private static final String HOME_WIDGETS_KEY = "home_widgets";
 
     private final SharedPreferences preferences;
 
@@ -205,6 +208,52 @@ final class LauncherPreferences {
     Set<String> quickFolderAppIds() {
         return new HashSet<>(preferences.getStringSet(
                 QUICK_FOLDER_APP_IDS_KEY, Collections.emptySet()));
+    }
+
+    Map<String, int[]> homeAppPositions() {
+        Map<String, int[]> result = new java.util.LinkedHashMap<>();
+        String serialized = preferences.getString(HOME_APP_POSITIONS_KEY, "");
+        if (serialized == null || serialized.isEmpty()) {
+            return result;
+        }
+        for (String line : serialized.split("\\n")) {
+            String[] parts = line.split("\\|");
+            if (parts.length == 3) {
+                try {
+                    result.put(parts[0], new int[] { Integer.parseInt(parts[1]), Integer.parseInt(parts[2]) });
+                } catch (NumberFormatException ignored) { }
+            }
+        }
+        return result;
+    }
+
+    void setHomeAppPosition(String appId, int cellX, int cellY) {
+        Map<String, int[]> positions = homeAppPositions();
+        positions.put(appId, new int[] { cellX, cellY });
+        saveHomeAppPositions(positions);
+    }
+
+    void setHomeAppPositions(Map<String, int[]> positions) {
+        saveHomeAppPositions(positions);
+    }
+
+    private void saveHomeAppPositions(Map<String, int[]> positions) {
+        StringBuilder value = new StringBuilder();
+        for (Map.Entry<String, int[]> entry : positions.entrySet()) {
+            if (value.length() > 0) value.append("\\n");
+            value.append(entry.getKey()).append('|')
+                    .append(entry.getValue()[0]).append('|')
+                    .append(entry.getValue()[1]);
+        }
+        preferences.edit().putString(HOME_APP_POSITIONS_KEY, value.toString()).apply();
+    }
+
+    Set<String> homeWidgetEntries() {
+        return new LinkedHashSet<>(preferences.getStringSet(HOME_WIDGETS_KEY, Collections.emptySet()));
+    }
+
+    void setHomeWidgetEntries(Set<String> entries) {
+        preferences.edit().putStringSet(HOME_WIDGETS_KEY, new HashSet<>(entries)).apply();
     }
 
     void setQuickFolderAppIds(Set<String> appIds) {
